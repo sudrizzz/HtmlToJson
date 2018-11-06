@@ -1,6 +1,7 @@
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -81,6 +82,7 @@ public class Cell {
                 /**
                  * code
                  */
+                detailTable(element);
                 return cellList;
                 // 明细表特殊处理
                 // 否则就为普通的td
@@ -139,4 +141,21 @@ public class Cell {
         }
         return map;
     }
+
+
+    /**
+     * 单独处理明细表
+     * @param element
+     * @return
+     */
+    public HashMap detailTable(Element element) {
+        HashMap map = new HashMap();
+        Elements elements = element.select("table");
+
+        for (Element e : elements) {
+
+        }
+        return map;
+    }
+
 }
