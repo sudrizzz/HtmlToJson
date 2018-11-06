@@ -15,8 +15,6 @@ public class GetJson {
 
     public String get(String filepath, String encoding) {
 
-        Attr attr = new Attr();
-
         try {
             // 读取文件将内容转成字符串
             File file = new File(filepath);
