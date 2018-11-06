@@ -64,52 +64,52 @@ public class Main {
 //            // 循环获取明细表信息
 //            // key相同，会把之前的值覆盖掉，但是每个明细表都会有rowheads和colheads...
 //            // 所以暂时先处理最后一个明细表，这个布局里有两个，暂时处理第一个
-//            for (int m = 0; m < elements1.first().select("tr").size(); m++) {
+//            for (int mainRow = 0; mainRow < elements1.first().select("tr").size(); mainRow++) {
 //                HashMap rowheadsdt = new HashMap(); // 行信息
 //                HashMap colheadsdt = new HashMap(); // 列信息
 //
 //                // 获取明细表的宽度，border，padding
 //                Integer widthdt = 0;
-//                if (elements1.get(m).attr("style").split(":")[1].endsWith("%")) { // 如果是百分比形式，进行特殊处理
-//                    widthdt = Integer.valueOf(elements1.get(m).attr("style").split(":")[1].split("%")[0].trim()) / 100 * width - border * 2 - padding * 2;
+//                if (elements1.get(mainRow).attr("style").split(":")[1].endsWith("%")) { // 如果是百分比形式，进行特殊处理
+//                    widthdt = Integer.valueOf(elements1.get(mainRow).attr("style").split(":")[1].split("%")[0].trim()) / 100 * width - border * 2 - padding * 2;
 //                } else {
-//                    widthdt = Integer.valueOf(elements1.get(m).attr("style").split(":")[1].trim()); // 不是百分比形式，直接取值
+//                    widthdt = Integer.valueOf(elements1.get(mainRow).attr("style").split(":")[1].trim()); // 不是百分比形式，直接取值
 //                }
-//                Integer borderdt = Integer.valueOf(elements1.get(m).attr("border").trim().equals("") ? "0" : elements1.get(m).attr("border").trim());
-//                Integer paddingdt = Integer.valueOf(elements1.get(m).attr("padding").trim().equals("") ? "0" : elements1.get(m).attr("padding").trim());
-//                Elements midTable1td1 = elements1.get(m).select("td.midTable1td1");
-//                Elements midTable1td2 = elements1.get(m).select("td.midTable1td2");
+//                Integer borderdt = Integer.valueOf(elements1.get(mainRow).attr("border").trim().equals("") ? "0" : elements1.get(mainRow).attr("border").trim());
+//                Integer paddingdt = Integer.valueOf(elements1.get(mainRow).attr("padding").trim().equals("") ? "0" : elements1.get(mainRow).attr("padding").trim());
+//                Elements midTable1td1 = elements1.get(mainRow).select("td.midTable1td1");
+//                Elements midTable1td2 = elements1.get(mainRow).select("td.midTable1td2");
 //                Integer colwidthdt = (widthdt - borderdt * 2 - paddingdt * 2) / midTable1td1.size();
 //
 //                // 每一列
 //                String colspan = ""; // 行单元格合并
 //                String rowspan = ""; // 列单元格合并
-//                for (int n = 0; n < midTable1td1.size(); n++) {
+//                for (int mainCol = 0; mainCol < midTable1td1.size(); mainCol++) {
 //
 //                    HashMap cell = new HashMap();
-//                    rowheadsdt.put("row_" + n, 30); // 顺序不是按照put的先后顺序排列...
-//                    colheadsdt.put("col_" + n, colwidthdt);
+//                    rowheadsdt.put("row_" + mainCol, 30); // 顺序不是按照put的先后顺序排列...
+//                    colheadsdt.put("col_" + mainCol, colwidthdt);
 //
 //                    // 对colspan和rowspan之后的单元格定位进行处理
-//                    cell.put("id", m + "," + (n + (colspan.equals("") ? 0 : Integer.valueOf(colspan))));
-//                    colspan = elements1.select("tr").select("td").get(m * n + n).attr("colspan").trim();
+//                    cell.put("id", mainRow + "," + (mainCol + (colspan.equals("") ? 0 : Integer.valueOf(colspan))));
+//                    colspan = elements1.select("tr").select("td").get(mainRow * mainCol + mainCol).attr("colspan").trim();
 //
 //                    // 列合并比较复杂，先不考虑，假设所有单元格都没有列合并
-////                    rowspan = elements1.select("tr").select("td").get(m * n + n).attr("rowspan").trim();
+////                    rowspan = elements1.select("tr").select("td").get(mainRow * mainCol + mainCol).attr("rowspan").trim();
 //                    cell.put("colspan", colspan.equals("") ? 0 : Integer.valueOf(colspan));
 //                    cell.put("rowspan", 0);
 //                    cell.put("etype", elements1.first().select("td").attr("td.InputStyle"));
-//                    ecdt.add(n, cell);
+//                    ecdt.add(mainCol, cell);
 //                }
-////                for (int n = 0; n < midTable1td2.size(); n++) {
-////                    rowheadsdt.put("row_" + n, 30);
-////                    colheadsdt.put("col_" + n, colwidthdt);
+////                for (int mainCol = 0; mainCol < midTable1td2.size(); mainCol++) {
+////                    rowheadsdt.put("row_" + mainCol, 30);
+////                    colheadsdt.put("col_" + mainCol, colwidthdt);
 ////                }
 //
 //                detailtable.put("rowheads", rowheadsdt);
 //                detailtable.put("colheads", colheadsdt);
 //                detailtable.put("ec", ecdt);
-//                etables.put("detail_" + (m + 1), detailtable);
+//                etables.put("detail_" + (mainRow + 1), detailtable);
 //
 //            }
 //
