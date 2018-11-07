@@ -12,6 +12,21 @@ import java.util.LinkedHashMap;
 
 public class Cell {
 
+
+    int mainRow = 0; // 主表行
+    int mainCol = 0; // 主表列
+    int detailRow = 0; // 明细表行
+    int detailCol = 0; // 明细表列
+    int detailCount = 0;
+    ArrayList mainList = new ArrayList(); // 主表list
+    LinkedHashMap eattr = new LinkedHashMap(); // 流程信息
+    LinkedHashMap formula = new LinkedHashMap(); // 脚本和公式
+    LinkedHashMap emaintable = new LinkedHashMap(); // 主表字段
+    LinkedHashMap etables = new LinkedHashMap(); // 表单内容
+    LinkedHashMap eformdesign = new LinkedHashMap();
+    LinkedHashMap result = new LinkedHashMap();
+
+
     public JSONObject getTableInfo(String filepath, String encoding) {
 
         StringBuffer sb = new StringBuffer();
@@ -29,18 +44,15 @@ public class Cell {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         Document document = Jsoup.parse(sb.toString());
+
         LinkedHashMap map = recursiveDFS(document);
 
         return new JSONObject(map);
     }
 
-    int mainRow = 0; // 主表行
-    int mainCol = 0; // 主表列
-    int detailCount = 0;
-    ArrayList mainList = new ArrayList(); // 主表list
-    LinkedHashMap emaintable = new LinkedHashMap();
-    LinkedHashMap etables = new LinkedHashMap();
+
 
     /**
      * 递归取出所有的节点信息，包括字段显示名和标题
@@ -50,12 +62,12 @@ public class Cell {
      */
     public LinkedHashMap recursiveDFS(Element element) {
 
-        if (element.tag().toString().equals("tr") && element.child(0).tag().toString().equals("td")) {
+        if (element.tag().toString().equals("tr")
+                && element.child(0).tag().toString().equals("td")){
             mainRow++; // 下一行
             mainCol = 0; // 列归零
         }
         if (element.tag().toString().equals("td")) {
-
             // 如果td里面是table，则认为其是明细表，进行特殊处理
             if (element.select("table").size() != 0) {
                 for (Element e : element.select("table")) {
@@ -99,24 +111,26 @@ public class Cell {
                 // 如果里面有strong标签，则作为标题处理
             } else if (element.select("strong").size() != 0) {
                 LinkedHashMap map = new LinkedHashMap();
-                String color = element.parent().selectFirst("font").attr("color");
-                String size = element.parent().selectFirst("font").attr("size");
-                String weight = element.parent().selectFirst("font").attr("weight");
+                ArrayList list = new ArrayList();
+                map.put("id", mainRow + "," + 0);
+                if (element.parent().select("font").size() != 0) {
+                    String color = element.parent().selectFirst("font").attr("color");
+                    String size = element.parent().selectFirst("font").attr("size");
+                    String weight = element.parent().selectFirst("font").attr("weight");
+                    map.put("color", color);
+                    map.put("size", size);
+                    map.put("weight", weight);
+                }
                 String colspan = element.attr("colspan");
                 String width = element.attr("width");
                 String align = element.attr("align");
                 String text = element.text();
-                map.put("id", mainRow + "," + 0);
-                map.put("color", color);
-                map.put("size", size);
-                map.put("weight", weight);
                 map.put("colspan", colspan);
                 map.put("width", width);
                 map.put("align", align);
                 map.put("text", text);
-                ArrayList list = (ArrayList) etables.get("title");
                 list.add(map);
-                etables.put("title", list);
+                emaintable.put("ec", list);
                 mainRow++;
                 return etables;
 
@@ -158,31 +172,39 @@ public class Cell {
             etables.put("emaintable", emaintable);
             recursiveDFS(child);
         }
-        return etables;
+
+//        getCssAndScript(element);
+//        rs.execute(select * from workflow_nodehtmllayout where syspath like filepath)
+        eattr.put("formname", "test");
+        eattr.put("wfid", "9244");
+        eattr.put("nodeid", "11995");
+        eattr.put("formid", "-952");
+        eattr.put("isbill", "-1");
+        eformdesign.put("eattr", eattr);
+        eformdesign.put("etables", etables);
+        eformdesign.put("formula", formula);
+        result.put("eformdesign", eformdesign);
+        return result;
     }
 
 
     /**
      * 取出表单关联的js,css
      *
-     * @param doc
+     * @param element
      * @return
      */
-    public LinkedHashMap getCssAndScript(Document doc) {
-        LinkedHashMap map = new LinkedHashMap();
-        int i = 0;
-        for (Element e : doc.select("link")) {
-            map.put(++i, e);
+    int count = 0;
+    public LinkedHashMap getCssAndScript(Element element) {
+        ArrayList list = new ArrayList();
+        String elementName =  element.tag().toString();
+        if (elementName.equals("link") || elementName.equals("script")) {
+            list.add(element);
+            formula.put(list.size(), list);
         }
-        for (Element e : doc.select("script")) {
-            map.put(++i, e);
-        }
-        return map;
+        return formula;
     }
 
-
-    int detailRow = 0; // 明细表行
-    int detailCol = 0; // 明细表列
 
     /**
      * 单独处理明细表
@@ -203,25 +225,29 @@ public class Cell {
                 }
                 if (e.tag().toString().equals("strong")) {
                     e = e.parent();
+
                     LinkedHashMap map = new LinkedHashMap();
                     ArrayList titleMap = new ArrayList();
-                    String color = e.attr("color");
-                    String size = e.attr("size");
-                    String weight = e.attr("weight");
+
+                    map.put("id", mainRow + "," + 0);
+                    if (e.parent().select("font").size() != 0) {
+                        String color = e.attr("color");
+                        String size = e.attr("size");
+                        String weight = e.attr("weight");map.put("color", color);
+                        map.put("size", size);
+                        map.put("weight", weight);
+
+                    }
                     String colspan = e.attr("colspan");
                     String width = e.attr("width");
                     String align = e.attr("align");
                     String text = e.text();
-                    map.put("id", mainRow + "," + 0);
-                    map.put("color", color);
-                    map.put("size", size);
-                    map.put("weight", weight);
                     map.put("colspan", colspan);
                     map.put("width", width);
                     map.put("align", align);
                     map.put("text", text);
-                    titleMap.add(map);
-                    etables.put("title", titleMap);
+                    mainList.add(map);
+                    emaintable.put("ec", mainList);
                     mainRow++;
                     return etables;
                 }
