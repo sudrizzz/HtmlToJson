@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0133f9e2-3eba-407f-9998-1409a9ad00ef" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/Cell.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/Cell.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Cell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,26 +23,26 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="class" value="7" />
+          <entry key="class" value="8" />
           <entry key="iml" value="1" />
           <entry key="java" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CLASS" value="7" />
+          <entry key="CLASS" value="8" />
           <entry key="IDEA_MODULE" value="1" />
           <entry key="JAVA" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="7042" />
+          <entry key="java" value="7594" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="7042" />
+          <entry key="JAVA" value="7594" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -55,8 +56,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Cell.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="451">
-              <caret line="194" column="13" lean-forward="true" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
+            <state relative-caret-position="-1961">
+              <caret line="103" column="68" selection-start-line="103" selection-start-column="68" selection-end-line="103" selection-end-column="68" />
             </state>
           </provider>
         </entry>
@@ -65,7 +66,7 @@
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="132">
-              <caret line="6" column="62" selection-start-line="6" selection-start-column="62" selection-end-line="6" selection-end-column="62" />
+              <caret line="6" column="59" selection-start-line="6" selection-start-column="56" selection-end-line="6" selection-end-column="59" />
             </state>
           </provider>
         </entry>
@@ -82,6 +83,9 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>ArrayList list = (ArrayList) displayNameMap.get(&quot;-1&quot;);</find>
+      <find>HashMap</find>
+      <find>str</find>
+      <find>detailCount</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -145,11 +149,11 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541570266943" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541577893726" />
     <property name="last_opened_file_path" value="D:/Download/jsoup-1.11.3.jar!/" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15527344" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -195,12 +199,12 @@
       <option name="presentableId" value="Default" />
       <updated>1541464929760</updated>
       <workItem from="1541464931339" duration="38145000" />
-      <workItem from="1541556754140" duration="7998000" />
+      <workItem from="1541556754140" duration="15599000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56474000" />
+    <option name="totallyTimeSpent" value="64075000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -220,7 +224,7 @@
       <window_info anchor="bottom" id="Find" order="4" weight="0.32897383" />
       <window_info anchor="bottom" id="Run" order="5" weight="0.28633407" />
       <window_info anchor="bottom" id="Database Changes" order="6" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Debug" order="7" weight="0.37852496" />
+      <window_info active="true" anchor="bottom" id="Debug" order="7" visible="true" weight="0.37852496" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="10" />
@@ -241,6 +245,30 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Cell.java</url>
+          <line>118</line>
+          <properties />
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Cell.java</url>
+          <line>224</line>
+          <properties />
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Cell.java</url>
+          <line>101</line>
+          <properties />
+          <option name="timeStamp" value="69" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/HtmlToJson.iml">
@@ -265,27 +293,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/out/Cell.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4593">
-          <caret line="18" column="20" lean-forward="true" selection-start-line="18" selection-start-column="20" selection-end-line="18" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#10115#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
-          <caret line="6" column="62" selection-start-line="6" selection-start-column="62" selection-end-line="6" selection-end-column="62" />
+          <caret line="6" column="59" selection-start-line="6" selection-start-column="56" selection-end-line="6" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/out/Cell.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="18" column="20" lean-forward="true" selection-start-line="18" selection-start-column="20" selection-end-line="18" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Cell.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="451">
-          <caret line="194" column="13" lean-forward="true" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
+        <state relative-caret-position="-1961">
+          <caret line="103" column="68" selection-start-line="103" selection-start-column="68" selection-end-line="103" selection-end-column="68" />
         </state>
       </provider>
     </entry>
