@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class Cell {
 
-    public JSONObject getTable(String filepath, String encoding) {
+    public JSONObject getTableInfo(String filepath, String encoding) {
 
         StringBuffer sb = new StringBuffer();
         try {
@@ -29,12 +29,11 @@ public class Cell {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // 使用Jsoup解析html字符串
         Document document = Jsoup.parse(sb.toString());
         // 获取根节点
-        ArrayList list = recursiveDFS(document);
+        HashMap map = recursiveDFS(document);
 
-        System.out.println(list);
+        System.out.println(new JSONObject(map));
 
         return null;
     }
@@ -42,6 +41,9 @@ public class Cell {
     int mainRow = 0; // 主表行
     int mainCol = 0; // 主表列
     ArrayList cellList = new ArrayList(); // 主表list
+    HashMap emaintable = new HashMap();
+    HashMap detail = new HashMap();
+    HashMap etables = new HashMap();
 
     /**
      * 递归取出所有的节点信息，包括字段显示名和标题
@@ -49,19 +51,18 @@ public class Cell {
      * @param element
      * @return
      */
-    public ArrayList recursiveDFS(Element element) {
+    public HashMap recursiveDFS(Element element) {
         if (element.tag().toString().equals("tr") && element.child(0).tag().toString().equals("td")) {
             mainRow++; // 下一行
             mainCol = 0; // 列归零
         }
         if (element.tag().toString().equals("td")) {
-
             // 如果td里面是table，则认为其是明细表，进行特殊处理
             if (element.select("table").size() != 0) {
                 for (Element e : element.select("table")) {
-                    cellList.add(detailTableAnalyse(e));
+                    System.out.println(detailTableAnalyse(e));
                 }
-                return cellList;
+                return etables;
                 // 如果td里面是input框，则针对input框进行处理
             } else if (element.select("input").size() != 0) {
                 for (int i = 0; i < element.select("input").size(); i++) {
@@ -70,50 +71,24 @@ public class Cell {
                     String name = element.select("input").get(i).attr("name");
                     String value = element.select("input").get(i).attr("value");
                     inputMap.put("id", mainRow + "," + mainCol);
-                    inputMap.put("colspan", colspan.equals("") ? 1 : colspan);
-                    inputMap.put("rowspan", 1);
-                    inputMap.put("fieldid", name.substring(5));
+                    inputMap.put("colspan", colspan.equals("") ? "1" : colspan);
+                    inputMap.put("rowspan", "1");
+                    inputMap.put("field", name.substring(5));
                     inputMap.put("fieldtype", "text");
-                    inputMap.put("etype", 3);
+                    inputMap.put("etype", "3");
                     inputMap.put("evalue", value);
                     cellList.add(inputMap);
+                    emaintable.put("ec", cellList);
+                    etables.put("emaintable", emaintable);
                     if (!colspan.equals("")) {
                         mainCol += Integer.valueOf(colspan);
                     } else {
                         mainCol++;
                     }
-                    return cellList;
+                    return etables;
                 }
                 // 否则就为普通的td
             } else {
-                // 如果包含strong标签，则为表头标题
-                if (element.select("strong").size() != 0) {
-//                    String color = element.attr("color");
-//                    String size = element.attr("size");
-//                    String weight = element.attr("weight");
-//                    String colspan = element.attr("colspan");
-//                    String width = element.attr("width");
-//                    String align = element.attr("align");
-//                    String text = element.text();
-//                    HashMap titleMap = new HashMap();
-//                    titleMap.put("id", mainRow + "," + mainCol);
-//                    titleMap.put("colspan", colspan.equals("") ? 1 : colspan);
-//                    titleMap.put("rowspan", 1);
-//                    titleMap.put("width", width);
-//                    titleMap.put("align", align);
-//                    titleMap.put("etype", 2);
-//                    titleMap.put("field", text);
-//                    titleMap.put("weight", weight);
-//                    titleMap.put("size", size);
-//                    titleMap.put("color", color);
-//                    if (!colspan.equals("")) {
-//                        mainCol += Integer.valueOf(colspan);
-//                    } else {
-//                        mainCol++;
-//                    }
-                    return cellList;
-                }
-                // 普通标签
                 HashMap inputMap = new HashMap();
                 String colspan = element.attr("colspan");
                 String width = element.attr("width");
@@ -125,29 +100,31 @@ public class Cell {
                         String name = nextElement.select("input").get(i).attr("name");
                         String value = nextElement.select("input").get(i).attr("value");
                         inputMap.put("evalue", value);
-                        inputMap.put("fieldid", name.substring(5));
+                        inputMap.put("field", name.substring(5));
                     }
                 }
                 inputMap.put("id", mainRow + "," + mainCol);
-                inputMap.put("colspan", colspan.equals("") ? 1 : colspan);
-                inputMap.put("rowspan", 1);
+                inputMap.put("colspan", colspan.equals("") ? "1" : colspan);
+                inputMap.put("rowspan", "1");
                 inputMap.put("width", width);
                 inputMap.put("align", align);
-                inputMap.put("etype", 2);
-                inputMap.put("field", text);
+                inputMap.put("etype", "2");
                 cellList.add(inputMap);
+                emaintable.put("ec", cellList);
+                etables.put("emaintable", emaintable);
                 if (!colspan.equals("")) {
                     mainCol += Integer.valueOf(colspan);
                 } else {
                     mainCol++;
                 }
-                return cellList;
             }
         }
         for (Element child : element.children()) {
+            emaintable.put("ec", cellList);
+            etables.put("emaintable", emaintable);
             recursiveDFS(child);
         }
-        return cellList;
+        return etables;
     }
 
 
@@ -185,8 +162,12 @@ public class Cell {
             detailRow++; // 下一行
             detailCol = 0; // 列归零
         }
-        if (element.select("strong").size() != 0 && element.select("td").size() == 0) {
+        if (element.select("strong").size() != 0 && !(element.text().trim().equals(""))) {
+            // 表单标题
             for (Element e : element.select("strong").parents()) {
+                if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
+                    return detailList;
+                }
                 HashMap detailMap = new HashMap();
                 String color = e.attr("color");
                 String size = e.attr("size");
@@ -217,12 +198,11 @@ public class Cell {
                         String value = detailtd.select("input").get(i).attr("value");
                         detailMap.put("id", detailRow + "," + detailCol);
                         detailMap.put("rowspan", 1);
-                        detailMap.put("fieldid", name.substring(5));
+                        detailMap.put("field", name.substring(5));
                         detailMap.put("fieldtype", "text");
                         detailMap.put("etype", 3);
                         detailMap.put("evalue", value);
                         detailList.add(detailMap);
-                        return detailList;
                     }
                 } else if (!(detailtd.text().trim().equals("")) && !(detailtd.text().trim().equals("&nbsp;"))) {
                     // 否则就为普通的td
@@ -238,9 +218,9 @@ public class Cell {
                     detailMap.put("field", text);
                     detailList.add(detailMap);
                     detailCol++;
-                    return detailList;
                 }
             }
+            return detailList;
         }
         for (Element e : element.select("td")) {
             detailTableAnalyse(e);
@@ -248,3 +228,4 @@ public class Cell {
         return detailList;
     }
 }
+
