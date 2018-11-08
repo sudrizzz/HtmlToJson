@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Cell {
@@ -19,12 +18,12 @@ public class Cell {
     int detailCol = 0; // 明细表列
     int detailCount = 0;
     ArrayList mainList = new ArrayList(); // 主表list
-    LinkedHashMap eattr = new LinkedHashMap(); // 流程信息
+    LinkedHashMap eattr = new LinkedHashMap<>(); // 流程信息
     LinkedHashMap formula = new LinkedHashMap(); // 脚本和公式
     LinkedHashMap emaintable = new LinkedHashMap(); // 主表字段
     LinkedHashMap etables = new LinkedHashMap(); // 表单内容
-    LinkedHashMap eformdesign = new LinkedHashMap();
-    LinkedHashMap result = new LinkedHashMap();
+    LinkedHashMap<String, LinkedHashMap> eformdesign = new LinkedHashMap();
+    LinkedHashMap result = new LinkedHashMap<String, LinkedHashMap>();
     LinkedHashMap mainRowheads = new LinkedHashMap(); // 主表行统计
     LinkedHashMap mainColheads = new LinkedHashMap(); // 主表列统计
     LinkedHashMap detailRowheads = new LinkedHashMap(); // 明细表行统计
@@ -51,7 +50,12 @@ public class Cell {
 
         Document document = Jsoup.parse(sb.toString());
 
-        LinkedHashMap map = recursiveDFS(document);
+        LinkedHashMap<String, LinkedHashMap> map = new LinkedHashMap<>();
+        map = recursiveDFS(document);
+//        map.get("eformdesign").put("formula", getCssAndScript(document));
+
+        LinkedHashMap map1 = getCssAndScript(document);
+        map.get("eformdesign").put("formula", map1);
 
         return new JSONObject(map);
     }
@@ -86,8 +90,9 @@ public class Cell {
                 }
                 return etables;
 
-                // 如果td里面是input框，则针对input框进行处理
+            // 如果td里面是input框，则针对input框进行处理
             } else if (element.select("input").size() != 0) {
+
                 for (int i = 0; i < element.select("input").size(); i++) {
                     LinkedHashMap inputMap = new LinkedHashMap();
                     String colspan = element.attr("colspan");
@@ -118,8 +123,9 @@ public class Cell {
                     mainCol++;
                 }
 
-                // 如果里面有strong标签，则作为标题处理
+            // 如果里面有strong标签，则作为标题处理
             } else if (element.select("strong").size() != 0) {
+
                 LinkedHashMap map = new LinkedHashMap();
                 ArrayList list = new ArrayList();
                 map.put("id", mainRow + "," + 0);
@@ -149,7 +155,8 @@ public class Cell {
                 mainRow++;
                 return etables;
 
-            } else { // 否则就为普通的td
+            } else {
+                // 否则就为普通的td
                 LinkedHashMap inputMap = new LinkedHashMap();
                 String colspan = element.attr("colspan");
                 String width = element.attr("width");
@@ -248,7 +255,7 @@ public class Cell {
             }
         } else {
             for (Element detailtd : element.select("td")) {
-                if (detailtd.select("input").size() != 0) {
+                if (detailtd.select("input").size() != 0 || detailtd.select("a").size() != 0) {
                     for (int i = 0; i < detailtd.select("input").size(); i++) {
                         LinkedHashMap map = new LinkedHashMap();
                         String colspan = detailtd.attr("colspan");
@@ -261,6 +268,18 @@ public class Cell {
                         map.put("fieldtype", "text");
                         map.put("etype", 3);
                         map.put("evalue", value);
+                        detailList.add(map);
+                        detailMap.put("ec", detailList);
+                        detailCol++;
+                    }
+                    for (int i = 0; i < detailtd.select("a").size(); i++) {
+                        LinkedHashMap map = new LinkedHashMap();
+                        String colspan = detailtd.attr("colspan");
+                        map.put("id", detailRow + "," + detailCol);
+                        if (detailRow == 1) map.put("attr", "content");
+                        map.put("rowspan", 1);
+                        map.put("fieldtype", "text");
+                        map.put("etype", 3);
                         detailList.add(map);
                         detailMap.put("ec", detailList);
                         detailCol++;
@@ -312,12 +331,29 @@ public class Cell {
     int count = 0;
 
     public LinkedHashMap getCssAndScript(Element element) {
-        ArrayList list = new ArrayList();
-        String elementTag = element.tag().toString();
-        if (elementTag.equals("link") || elementTag.equals("script") || elementTag.equals("href")) {
-            list.add(element);
-            formula.put(list.size(), list);
+        LinkedHashMap linkMap = new LinkedHashMap();
+        LinkedHashMap scriptMap = new LinkedHashMap();
+        LinkedHashMap hrefMap = new LinkedHashMap();
+        int i = 0;
+
+        if (element.select("link").size() != 0
+                || element.select("script").size() != 0
+                || element.select("href").size() != 0) {
+            for (Element e : element.select("link")) {
+                linkMap.put(i++, e.toString());
+            }
+            i = 0;
+            for (Element e : element.select("script")) {
+                scriptMap.put(i++, e.toString());
+            }
+            i = 0;
+            for (Element e : element.select("href")) {
+                hrefMap.put(i++, e.toString());
+            }
         }
+        formula.put("link", linkMap);
+        formula.put("script", scriptMap);
+        formula.put("href", hrefMap);
         return formula;
     }
 
