@@ -8,10 +8,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Cell {
-
 
     int mainRow = 0; // 主表行
     int mainCol = 0; // 主表列
@@ -25,6 +25,10 @@ public class Cell {
     LinkedHashMap etables = new LinkedHashMap(); // 表单内容
     LinkedHashMap eformdesign = new LinkedHashMap();
     LinkedHashMap result = new LinkedHashMap();
+    LinkedHashMap mainRowheads = new LinkedHashMap(); // 主表行统计
+    LinkedHashMap mainColheads = new LinkedHashMap(); // 主表列统计
+    LinkedHashMap detailRowheads = new LinkedHashMap(); // 明细表行统计
+    LinkedHashMap detailColheads = new LinkedHashMap(); // 明细表列统计
 
 
     public JSONObject getTableInfo(String filepath, String encoding) {
@@ -53,7 +57,6 @@ public class Cell {
     }
 
 
-
     /**
      * 递归取出所有的节点信息，包括字段显示名和标题
      *
@@ -62,15 +65,20 @@ public class Cell {
      */
     public LinkedHashMap recursiveDFS(Element element) {
 
-        if (element.tag().toString().equals("tr")
-                && element.child(0).tag().toString().equals("td")){
-            mainRow++; // 下一行
+        if (element.tag().toString().equals("tr") && element.child(0).tag().toString().equals("td")) {
+            mainRowheads.put("row_" + mainRow, "30");
+            emaintable.put("rowheads", mainRowheads);
+            mainRow++; // 行数加一
             mainCol = 0; // 列归零
         }
         if (element.tag().toString().equals("td")) {
             // 如果td里面是table，则认为其是明细表，进行特殊处理
             if (element.select("table").size() != 0) {
                 for (Element e : element.select("table")) {
+                    // 如果该元素下面还有table元素，则继续循环，直到取到最底层的明细table，防止重复
+                    if (e.select("table").size() > 1) {
+                        continue;
+                    }
                     LinkedHashMap map = detailTableAnalyse(e);
                     if (map.size() != 0) {
                         etables.put("detail_" + ++detailCount, map);
@@ -83,11 +91,13 @@ public class Cell {
                 for (int i = 0; i < element.select("input").size(); i++) {
                     LinkedHashMap inputMap = new LinkedHashMap();
                     String colspan = element.attr("colspan");
+                    String width = element.attr("width");
                     String name = element.select("input").get(i).attr("name");
                     String value = element.select("input").get(i).attr("value");
                     inputMap.put("id", mainRow + "," + mainCol);
                     inputMap.put("colspan", colspan.equals("") ? "1" : colspan);
                     inputMap.put("rowspan", "1");
+                    inputMap.put("width", width);
                     inputMap.put("field", name.substring(5));
                     inputMap.put("fieldtype", "text");
                     inputMap.put("etype", "3");
@@ -114,9 +124,14 @@ public class Cell {
                 ArrayList list = new ArrayList();
                 map.put("id", mainRow + "," + 0);
                 if (element.parent().select("font").size() != 0) {
+                    String weight = "";
                     String color = element.parent().selectFirst("font").attr("color");
                     String size = element.parent().selectFirst("font").attr("size");
-                    String weight = element.parent().selectFirst("font").attr("weight");
+                    if (element.parent().selectFirst("font").attr("weight").equals("")) {
+                        weight = element.parent().selectFirst("font").attr("size");
+                    } else {
+                        weight = element.parent().selectFirst("font").attr("weight");
+                    }
                     map.put("color", color);
                     map.put("size", size);
                     map.put("weight", weight);
@@ -168,8 +183,6 @@ public class Cell {
             }
         }
         for (Element child : element.children()) {
-            emaintable.put("ec", mainList);
-            etables.put("emaintable", emaintable);
             recursiveDFS(child);
         }
 
@@ -180,29 +193,12 @@ public class Cell {
         eattr.put("nodeid", "11995");
         eattr.put("formid", "-952");
         eattr.put("isbill", "-1");
+        etables.put("emaintable", emaintable);
         eformdesign.put("eattr", eattr);
         eformdesign.put("etables", etables);
         eformdesign.put("formula", formula);
         result.put("eformdesign", eformdesign);
         return result;
-    }
-
-
-    /**
-     * 取出表单关联的js,css
-     *
-     * @param element
-     * @return
-     */
-    int count = 0;
-    public LinkedHashMap getCssAndScript(Element element) {
-        ArrayList list = new ArrayList();
-        String elementName =  element.tag().toString();
-        if (elementName.equals("link") || elementName.equals("script")) {
-            list.add(element);
-            formula.put(list.size(), list);
-        }
-        return formula;
     }
 
 
@@ -227,16 +223,14 @@ public class Cell {
                     e = e.parent();
 
                     LinkedHashMap map = new LinkedHashMap();
-                    ArrayList titleMap = new ArrayList();
-
                     map.put("id", mainRow + "," + 0);
                     if (e.parent().select("font").size() != 0) {
                         String color = e.attr("color");
                         String size = e.attr("size");
-                        String weight = e.attr("weight");map.put("color", color);
+                        String weight = e.attr("weight");
+                        map.put("color", color);
                         map.put("size", size);
                         map.put("weight", weight);
-
                     }
                     String colspan = e.attr("colspan");
                     String width = e.attr("width");
@@ -289,9 +283,15 @@ public class Cell {
                     detailCol++;
                 }
                 if (detailtd.nextElementSibling() == null) {
-                    if (detailRow == 1) detailRow = 0; // 明细表只有两行，一行为表头，一行为字段
-                    else detailRow++; // 下一行
+                    if (detailRow == 1) {
+                        detailRowheads.put("row_" + detailRow, "30");
+                        detailRow = 0; // 明细表只有两行，一行为表头，一行为字段
+                    } else {
+                        detailRowheads.put("row_" + detailRow, "30");
+                        detailRow++; // 下一行
+                    }
                     detailCol = 0; // 列归零
+                    detailMap.put("rowheads", detailRowheads);
                 }
             }
             return detailMap;
@@ -301,5 +301,50 @@ public class Cell {
         }
         return detailMap;
     }
+
+
+    /**
+     * 取出表单关联的js,css
+     *
+     * @param element
+     * @return
+     */
+    int count = 0;
+
+    public LinkedHashMap getCssAndScript(Element element) {
+        ArrayList list = new ArrayList();
+        String elementTag = element.tag().toString();
+        if (elementTag.equals("link") || elementTag.equals("script") || elementTag.equals("href")) {
+            list.add(element);
+            formula.put(list.size(), list);
+        }
+        return formula;
+    }
+
+
+    /**
+     * 获取每一列的宽度
+     * 总宽度除以标题栏的colspan值即为每一列的宽度
+     *
+     * @param element
+     * @return
+     */
+//    public LinkedHashMap getEveryColWidth(Element element) {
+//        Integer totalWidth = 0;
+//        Integer colspan = 0;
+//
+//        for (Element e : element.getElementsByClass("table")) {
+//
+//            if (e.tag().toString().equals("table") && e.hasClass("table")) {
+//                totalWidth = Integer.valueOf(element.attr("width"));
+//                colspan = Integer.valueOf(element.selectFirst("td").attr("colspan"));
+//                String perwidth = (totalWidth / colspan) + "";
+//                for (int i = 0; i < colspan; i++) {
+//                    detailColheads.put("col_", perwidth);
+//                }
+//            }
+//        }
+//        return detailColheads;
+//    }
 }
 
