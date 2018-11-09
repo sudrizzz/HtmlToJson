@@ -15,6 +15,8 @@ public class Cell {
 
     int mainRow = 0; // 主表行
     int mainCol = 0; // 主表列
+    int totalWidth = 0; // 表单总宽度
+    int totalCols = 0; // 主表总行数
     int detailRow = 0; // 明细表行
     int detailCol = 0; // 明细表列
     int detailCount = 0;
@@ -29,7 +31,6 @@ public class Cell {
     LinkedHashMap mainRowheads = new LinkedHashMap(); // 主表行宽
     LinkedHashMap mainColheads = new LinkedHashMap(); // 主表列宽
     LinkedHashMap detailRowheads = new LinkedHashMap(); // 明细表行宽
-    LinkedHashMap detailColheads = new LinkedHashMap(); // 明细表列宽
 
 
     public JSONObject getTableInfo(String filepath, String encoding) {
@@ -51,13 +52,28 @@ public class Cell {
         }
 
         Document document = Jsoup.parse(sb.toString());
+        int totalWidth = Integer.valueOf(document.selectFirst("table[width]").attr("width"));
+        int totalCols = Integer.valueOf(document.selectFirst("td[colspan]").attr("colspan"));
+        for (int i = 0; i < totalCols; i++) {
+            mainColheads.put("col_" + i, totalWidth / totalCols);
+        }
         dtTotalColWidth = Double.valueOf(document.selectFirst("table[width]").attr("width"));
 
-        LinkedHashMap<String, LinkedHashMap> map = new LinkedHashMap<>();
-        map = recursiveDFS(document);
-        map.get("eformdesign").put("formula", getCssAndScript(document));
+        eattr.put("formname", "test");
+        eattr.put("wfid", "9244");
+        eattr.put("nodeid", "11995");
+        eattr.put("formid", "-952");
+        eattr.put("isbill", "-1");
+        emaintable.put("rowheads", mainRowheads);
+        emaintable.put("colheads", mainColheads);
+        etables.put("emaintable", emaintable);
+        eformdesign.put("eattr", eattr);
+        eformdesign.put("etables", etables);
+        eformdesign.put("formula", formula);
+        eformdesign.put("formula", getCssAndScript(document));
+        result.put("eformdesign", eformdesign);
 
-        return new JSONObject(map);
+        return new JSONObject(recursiveDFS(document));
     }
 
 
@@ -70,8 +86,8 @@ public class Cell {
     public LinkedHashMap recursiveDFS(Element element) {
 
         if (element.tag().toString().equals("tr") && element.child(0).tag().toString().equals("td")) {
+
             mainRowheads.put("row_" + mainRow, "30");
-            emaintable.put("rowheads", mainRowheads);
             mainRow++; // 行数加一
             mainCol = 0; // 列归零
         }
@@ -80,13 +96,6 @@ public class Cell {
             if (element.select("table").size() != 0) {
 //                Double detailWidth = 0.0;
                 for (Element e : element.select("table")) {
-//                    if (e.attr("width") != null && !e.attr("width").equals("")) {
-//                        if (e.attr("width").contains("%")) {
-//                            detailWidth = dtTotalColWidth;
-//                        } else {
-//                            detailWidth = Double.valueOf(e.attr("width"));
-//                        }
-//                    }
                     // 如果该元素下面还有table元素，则继续循环，直到取到最底层的明细table，防止重复
                     if (e.select("table").size() > 1) {
                         continue;
@@ -97,6 +106,7 @@ public class Cell {
                     }
                     // 获取明细表每列的宽度
                     if (e.attr("id") != null && e.attr("id").contains("oTable")) {
+                        LinkedHashMap detailColheads = new LinkedHashMap(); // 明细表列宽
                         LinkedHashMap widthMap = new LinkedHashMap();
                         Double perColWidth = 0.0;
                         int i = 0;
@@ -166,9 +176,9 @@ public class Cell {
                     emaintable.put("ec", mainList);
                     mainCol++;
                 }
+
                 // 如果里面有strong标签，则作为标题处理
             } else if (element.select("strong").size() != 0) {
-
                 LinkedHashMap map = new LinkedHashMap();
                 ArrayList list = new ArrayList();
                 map.put("id", mainRow + "," + 0);
@@ -198,8 +208,8 @@ public class Cell {
                 mainRow++;
                 return etables;
 
-            } else {
                 // 否则就为普通的td
+            } else {
                 LinkedHashMap map = new LinkedHashMap();
                 String colspan = element.attr("colspan");
                 String width = element.attr("width");
@@ -236,18 +246,8 @@ public class Cell {
             recursiveDFS(child);
         }
 
-//        getCssAndScript(element);
-//        rs.execute(select * from workflow_nodehtmllayout where syspath like filepath)
-        eattr.put("formname", "test");
-        eattr.put("wfid", "9244");
-        eattr.put("nodeid", "11995");
-        eattr.put("formid", "-952");
-        eattr.put("isbill", "-1");
-        etables.put("emaintable", emaintable);
-        eformdesign.put("eattr", eattr);
-        eformdesign.put("etables", etables);
-        eformdesign.put("formula", formula);
-        result.put("eformdesign", eformdesign);
+//        rs.execute(select * from workflow_nodehtmllayout where syspath like ?, filepath)
+
         return result;
     }
 
@@ -314,8 +314,8 @@ public class Cell {
                         detailMap.put("ec", detailList);
                         detailCol++;
                     }
-                } else if (!(detailtd.text().trim().equals("")) && !(detailtd.text().trim().equals("&nbsp;"))) {
                     // 否则就为普通的td
+                } else if (!(detailtd.text().trim().equals("")) && !(detailtd.text().trim().equals("&nbsp;"))) {
                     LinkedHashMap map = new LinkedHashMap();
                     String width = detailtd.attr("width");
                     String align = detailtd.attr("align");
@@ -390,6 +390,7 @@ public class Cell {
      * @return
      */
     public LinkedHashMap getEveryColWidth(Element element) {
+        LinkedHashMap detailColheads = new LinkedHashMap(); // 明细表列宽
         Integer totalWidth = 0;
         Integer colspan = 0;
 
@@ -398,9 +399,9 @@ public class Cell {
             if (e.tag().toString().equals("table") && e.hasClass("table")) {
                 totalWidth = Integer.valueOf(element.attr("width"));
                 colspan = Integer.valueOf(element.selectFirst("td").attr("colspan"));
-                String perwidth = (totalWidth / colspan) + "";
+                String perColWidth = (totalWidth / colspan) + "";
                 for (int i = 0; i < colspan; i++) {
-                    detailColheads.put("col_", perwidth);
+                    detailColheads.put("col_", perColWidth);
                 }
             }
         }
