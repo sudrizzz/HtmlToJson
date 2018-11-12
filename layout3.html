@@ -1,0 +1,392 @@
+<script language=javascript type='text/JavaScript' >
+
+jQuery(document).ready(function(){
+      jQuery("#field5982").bind("change",function(){
+             if(document.getElementById("field5982").value=="1")
+             {  
+                    jQuery("#field14920span").html("");//清空数据
+
+                       jQuery("#field14917").hide();
+                    jQuery("#field14918").hide();
+                    jQuery("#field14919").hide();
+                    jQuery("#field14921").hide();
+
+                    jQuery("#field14920").parent().find("button").hide();
+
+
+             }else{
+                    jQuery("#field14917").val("");//清空数据
+                       jQuery("#field14918").val("");
+                    jQuery("#field14919").val("");
+                     jQuery("#field14921").val("");
+
+                    jQuery("#field14917").show();
+                    jQuery("#field14918").show();
+                    jQuery("#field14919").show();
+                    jQuery("#field14921").show();
+
+                    jQuery("#field14920").parent().find("button").show();
+
+
+             }
+      });
+     
+   });
+
+
+
+
+function setFieldReadOnly(fieldIds){
+	var fieldIdArray= new Array(); //定义一数组
+	fieldIdArray=fieldIds.split("@"); //字符分割   
+	for (i=0;i<fieldIdArray.length ;i++ ){
+	    var ofieldId = document.getElementById(fieldIdArray[i]);
+	    ofieldId.readOnly=true;
+	}
+}
+function setFieldReadOnlyOff(fieldIds){
+	var fieldIdArray= new Array(); //定义一数组
+	fieldIdArray=fieldIds.split("@"); //字符分割   
+	for (i=0;i<fieldIdArray.length ;i++ ){
+	    var ofieldId = document.getElementById(fieldIdArray[i]);
+	    ofieldId.readOnly=false;
+	}
+}
+
+</script><script language=javascript type='text/JavaScript' >
+
+jQuery(document).ready(function(){
+      jQuery("#field7029").bind("change",function(){
+             if(document.getElementById("field7029").value=="1")
+             {  
+                    jQuery("#field7166span").html("");//清空数据
+
+                       jQuery("#field7166").show();
+                    
+
+ 
+
+             }else{
+                    jQuery("#field7166").val("");//清空数据
+                      
+                    jQuery("#field7166").hide();
+                    
+
+
+
+
+             }
+      });
+     
+   });
+
+
+
+
+function setFieldReadOnly(fieldIds){
+	var fieldIdArray= new Array(); //定义一数组
+	fieldIdArray=fieldIds.split("@"); //字符分割   
+	for (i=0;i<fieldIdArray.length ;i++ ){
+	    var ofieldId = document.getElementById(fieldIdArray[i]);
+	    ofieldId.readOnly=true;
+	}
+}
+function setFieldReadOnlyOff(fieldIds){
+	var fieldIdArray= new Array(); //定义一数组
+	fieldIdArray=fieldIds.split("@"); //字符分割   
+	for (i=0;i<fieldIdArray.length ;i++ ){
+	    var ofieldId = document.getElementById(fieldIdArray[i]);
+	    ofieldId.readOnly=false;
+	}
+}
+
+</script>
+<p><script type="text/javascript" src="/westvalley/js/workflowX02004-getStandard.js"></script><script type="text/javascript" src="/westvalley/js/workflowX02004-Expexcel.js"></script></p>
+<p><script type="text/javascript" src="/belle/zb/X02004/X02004_biangeng.js"></script></p>
+<p>
+<link rel="stylesheet" type="text/css" href="/filesystem/CSS/BLJT/BLJT_from.css" /></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<table class="midTable1" border="1" cellspacing="0" cellpadding="3" width="1024" align="center">
+    <tbody>
+        <tr>
+            <td class="midTable1td1" colspan="6" align="right">
+            <table border="0" width="100%" align="center">
+                <tbody>
+                    <tr>
+                        <td align="center">
+                        <p><font color="#003d76" size="6"><strong>移动电话费用报销单&nbsp;</strong></font></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="16%" align="right">公司名称：</td>
+            <td class="midTable1td2" width="16%" colspan="3" align="left">&nbsp;<input id="$field111661$" class="InputStyle" name="field111661" value="[只读]记账公司下拉框" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">申请日期：</td>
+            <td class="midTable1td2" width="16%" align="left">&nbsp;<input id="$field5919$" class="InputStyle" name="field5919" value="[只读]申请日期" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">标题：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field-1$" class="InputStyle" name="field-1" value="[只读]标题" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">单号：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field5916$" class="InputStyle" name="field5916" value="[只读]编号" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">对公/对私：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field7029$" class="InputStyle" name="field7029" value="[只读]对公/对私" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">申请人：</td>
+            <td class="midTable1td2" width="7%" align="left">&nbsp;<input id="$field5917$" class="InputStyle" name="field5917" value="[只读]申请人" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">申请部门：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field11205$" class="InputStyle" name="field11205" value="[只读]顶级部门" type="text" /><br />
+            &nbsp;<input id="$field5918$" class="InputStyle" name="field5918" value="[只读]申请部门" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">是否为增值税专用发票：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field5982$" class="InputStyle" name="field5982" value="[只读]是否为增值税专用发票" type="text" /></td>
+        </tr>
+        <tr style="display: none">
+            <td class="midTable1td1" width="17%" align="right">部门负责人与部门分管领导是否一致：</td>
+            <td class="midTable1td2" width="17%" align="left"><input id="$field53543$" class="InputStyle" name="field53543" value="[可编辑]部门负责人与部门分管领导是否一致" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">部门分管领导与公司管理领导是否一致：</td>
+            <td class="midTable1td2" width="16%" align="left">&nbsp;<input id="$field53544$" class="InputStyle" name="field53544" value="[可编辑]部门分管领导与公司管理领导是否一致" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">公司管理领导与财务分管领导是否一致：</td>
+            <td class="midTable1td2" width="17%" align="left"><input id="$field53545$" class="InputStyle" name="field53545" value="[可编辑]公司管理领导与财务分管领导是否一致" type="text" /></td>
+        </tr>
+        <tr style="display: none" id="Div1">
+            <td class="midTable1td1" width="15%" align="right">收款人：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field13030$" class="InputStyle" name="field13030" value="[只读]收款人" type="text" /><input id="$field27438$" class="InputStyle" name="field27438" value="[只读]收款人-s" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">开户行（私）：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field5985$" class="InputStyle" name="field5985" value="[只读]开户行" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">帐号（私）：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field5986$" class="InputStyle" name="field5986" value="[只读]帐号" type="text" /></td>
+        </tr>
+        <tr style="display: none" id="Div0">
+            <td class="midTable1td1" width="15%" align="right">收款单位：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14795$" class="InputStyle" name="field14795" value="[只读]收款单位" type="text" /><input id="$field27439$" class="InputStyle" name="field27439" value="[只读]收款单位-g" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">开户行（公）：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14796$" class="InputStyle" name="field14796" value="[只读]开户行（公）" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">帐号（公）：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14797$" class="InputStyle" name="field14797" value="[只读]账户（公）" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">纳税人识别号：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14919$" class="InputStyle" name="field14919" value="[只读]纳税人识别号" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">最早开票日期：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14920$" class="InputStyle" name="field14920" value="[只读]最早开票日期" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">有效期剩余天数：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14921$" class="InputStyle" name="field14921" value="[只读]有效期剩余天数" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="16%" align="right">报销金额：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field5983$" class="InputStyle" name="field5983" value="[只读]报销金额" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">是否冲借款：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14792$" class="InputStyle" name="field14792" value="[只读]是否冲借款" type="text" /></td>
+            <td class="midTable1td1" width="16%" align="right">冲账金额：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14793$" class="InputStyle" name="field14793" value="[只读]冲账金额" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">剩余借款余额：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14791$" class="InputStyle" name="field14791" value="[只读]剩余借款余额" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">实付金额：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14794$" class="InputStyle" name="field14794" value="[只读]实付金额" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">实付金额：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field17460$" class="InputStyle" name="field17460" value="[只读]实付金额(大写)" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">是否只有国内话费：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field36897$" class="InputStyle" name="field36897" value="[只读]是否只有国内话费" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">电话号码：</td>
+            <td class="midTable1td2" width="17%" colspan="3" align="left">&nbsp;<input id="$field7166$" class="InputStyle" name="field7166" value="[只读]电话号码" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">附件：</td>
+            <td class="midTable1td2" width="17%" colspan="5" align="left">&nbsp;<input id="$field6759$" class="InputStyle" name="field6759" value="[只读]附件" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">报销材料完整递交财务时间：</td>
+            <td class="midTable1td2" width="17%" colspan="3" align="left">&nbsp;<input id="$field43257$" class="InputStyle" name="field43257" value="[只读]报销材料递交财务时间" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">预算内/预算外：</td>
+            <td class="midTable1td2" width="17%" align="left"><input id="$field57550$" class="InputStyle" name="field57550" value="[只读]预算内/外" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">备注：</td>
+            <td class="midTable1td2" width="17%" colspan="5" align="left">&nbsp;<input id="$field5949$" class="InputStyle" name="field5949" value="[只读]备注" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="15%" align="right">是否多部门分摊：</td>
+            <td class="midTable1td2" width="17%" align="left">&nbsp;<input id="$field14949$" class="InputStyle" name="field14949" value="[只读]是否多部门分摊" type="text" /></td>
+            <td class="midTable1td1" width="15%" align="right">分摊部门：</td>
+            <td class="midTable1td2" width="17%" colspan="3" align="left">&nbsp;<input id="$field14950$" class="InputStyle" name="field14950" value="[只读]分摊部门" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="17%" align="right">分摊顶级部门：</td>
+            <td class="midTable1td2" width="17%" colspan="5" align="left">&nbsp;<input id="$field165165$" class="InputStyle" name="field165165" value="[只读]分摊顶级部门" type="text" /></td>
+        </tr>
+        <tr>
+            <td class="midTable1td1" width="17%" colspan="6" align="center">&nbsp;<strong>费用报销明细</strong></td>
+        </tr>
+        <tr>
+            <td class="midTable1td2" colspan="6" align="right">
+            <table style="width: 100%; word-wrap: break-word; left: 0px" id="table0button" class="form" name="table0button">
+                <tbody>
+                    <tr>
+                        <td align="left">&nbsp;</td>
+                        <td align="right">
+                        <div id="div0button"><button accesskey="E" id="$delbutton0$" class="BtnFlow" name="delbutton0" onclick="if(isdel()){deleteRow0(0);}return false;"><u>E</u>-删除</button></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                        <table style="width: 100%" id="oTable0" class="ListStyle detailtable detailtableTopTable" border="1" name="oTable0">
+                            <colgroup><col width="3%"></col><col width="10%"></col><col width="10%"></col><col width="8%"></col><col width="8%"></col><col width="8%"></col><col width="8%"></col><col width="10%"></col><col width="10%"></col><col width="10%"></col><col width="13%"></col></colgroup>
+                            <tbody>
+                                <tr class="header detailtitle">
+                                    <td class="midTable1td1" align="center">序号</td>
+                                    <td class="midTable1td1" align="center">部门</td>
+                                    <td class="midTable1td1" align="center">年份</td>
+                                    <td class="midTable1td1" align="center">月份</td>
+                                    <td class="midTable1td1" align="center">标准额度</td>
+                                    <td class="midTable1td1" align="center">国际话费</td>
+                                    <td class="midTable1td1" align="center">国内话费</td>
+                                    <td class="midTable1td1" align="center">报销金额</td>
+                                    <td class="midTable1td1" align="center">税额</td>
+                                    <td class="midTable1td1" align="center">实际报销金额</td>
+                                    <td class="midTable1td1" align="center">备注</td>
+                                </tr>
+                                <tr>
+                                    <td class="midTable1td2" align="center"><input id="$field5970$" class="InputStyle" name="field5970" value="[只读]序号" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14946$" class="InputStyle" name="field14946" value="[只读]部门" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field7643$" class="InputStyle" name="field7643" value="[只读]年份" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field7644$" class="InputStyle" name="field7644" value="[只读]月份" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input style="width: 78px; height: 20px" id="$field5950$" class="InputStyle" size="10" name="field5950" value="[只读]标准额度" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field5952$" class="InputStyle" name="field5952" value="[只读]国际话费" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field5951$" class="InputStyle" name="field5951" value="[只读]国内话费" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input style="width: 56px; height: 20px" id="$field5953$" class="InputStyle" size="7" name="field5953" value="[只读]报销金额" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field17073$" class="InputStyle" name="field17073" value="[只读]税额" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14948$" class="InputStyle" name="field14948" value="[只读]实际报销金额" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field5954$" class="InputStyle" name="field5954" value="[只读]备注" type="text" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </td>
+        </tr>
+        <tr style="display: none" id="DIV3">
+            <td class="midTable1td2" colspan="6" align="right">
+            <table style="width: 100%; word-wrap: break-word; left: 0px" id="table4button" class="form" name="table4button">
+                <tbody>
+                    <tr>
+                        <td class="midTable1td1" width="17%" colspan="6" align="center">&nbsp;<strong>费用分摊明细</strong></td>
+                    </tr>
+                    <tr>
+                        <td align="left">&nbsp;</td>
+                        <td align="right">
+                        <div id="div3button"><button accesskey="E" id="$delbutton3$" class="BtnFlow" name="delbutton3" onclick="if(isdel()){deleteRow3(3);}return false;"><u>E</u>-删除</button></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                        <table style="width: 100%" id="oTable0" class="ListStyle detailtable detailtableTopTable" border="1" name="oTable0">
+                            <colgroup><col width="3%"></col><col width="17%"></col><col width="16%"></col><col width="17%"></col><col width="17%"></col><col width="13%"></col><col width="17%"></col></colgroup>
+                            <tbody>
+                                <tr class="header detailtitle">
+                                    <td class="midTable1td1" align="center">序号</td>
+                                    <td class="midTable1td1" align="center">费用类型</td>
+                                    <td class="midTable1td1" align="center">分摊顶级部门</td>
+                                    <td class="midTable1td1" align="center">分摊部门</td>
+                                    <td class="midTable1td1" align="center">分摊金额</td>
+                                    <td class="midTable1td1" align="center">税率%</td>
+                                    <td class="midTable1td1" align="center">实际分摊金额（不含税额）</td>
+                                </tr>
+                                <tr>
+                                    <td class="midTable1td2" align="center"><input id="$field14940$" class="InputStyle" name="field14940" value="[只读]序号" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14941$" class="InputStyle" name="field14941" value="[只读]费用类型" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field34324$" class="InputStyle" name="field34324" value="[只读]分摊顶级部门" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14942$" class="InputStyle" name="field14942" value="[只读]分摊部门" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14943$" class="InputStyle" name="field14943" value="[只读]分摊金额" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14944$" class="InputStyle" name="field14944" value="[只读]税率" type="text" /></td>
+                                    <td class="midTable1td2" align="center"><input id="$field14945$" class="InputStyle" name="field14945" value="[只读]实际分摊金额（不含税额）" type="text" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<script language="javascript" type="text/javascript">
+
+jQuery(document).ready(function(){
+
+    jQuery("#field7029").bind("change",getvalue);
+    getvalue();
+    
+});
+
+function getvalue(){
+
+    if(jQuery("#field7029").length==1){
+       if('' != jQuery("#field7029").val()){
+           changeItem(jQuery("#field7029").val());
+       }
+    }else if(jQuery("#disfield7029").length==1){
+       changeItem(jQuery("#disfield7029").val());
+    }
+}
+
+function changeItem(i)
+{
+    var k = 3;
+    for(var j = 0;j < k;j++){
+      if(j == i){
+	  jQuery("#Div"+j).show();
+      }else{
+	  jQuery("#Div"+j).hide();
+      }
+    }
+}
+
+
+function on_hide(){
+  document.getElementById("hide").style.display = (document.getElementById("checkbox").checked == true) ? "block" : "none";
+}
+
+</script><script language="javascript" type="text/javascript" >  
+//是否为多部门分摊明细显示隐藏
+
+function hideDiv(){
+//alert('2222');
+	var check1vaule = document.getElementById("field14949").value;
+	if(check1vaule==''){ //为空
+		document.getElementById("DIV3").style.display='none';
+				
+	}else if(check1vaule=='0'){
+		document.getElementById("DIV3").style.display='';
+			}else if(check1vaule=='1'){
+		document.getElementById("DIV3").style.display='none';
+				
+	
+	}
+}
+
+try{
+    function eventLoad()
+    {
+        document.getElementById('field14949').attachEvent('onpropertychange',hideDiv);
+		hideDiv();
+    }
+    if (document.all){
+      window.attachEvent('onload',eventLoad)
+    }else{
+      window.addEventListener('load',eventLoad,false);
+    }
+
+}catch(e){}
+</script>
