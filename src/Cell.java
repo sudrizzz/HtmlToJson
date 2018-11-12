@@ -145,19 +145,13 @@ public class Cell {
                     cellAttr.setFieldattr(2); // 编辑
                     cellAttr.setFieldtype("1"); // 单行文本框
                     cellAttr.setEvalue(element.select("input").get(i).attr("value"));
-                    cellAttr.setItalic(false);
-                    cellAttr.setBold(false);
-                    cellAttr.setDeleteline(false);
-                    cellAttr.setUnderline(false);
                     cellAttr.setHalign(1); // 左右居中
                     cellAttr.setValign(1); // 上下居中
-                    cellAttr.setWordwrap(false); //缩进
-                    cellAttr.setIndent(0);
                     cellAttr.setBackground_color("");
                     cellAttr.setBackground_image("");
                     cellAttr.setBackground_imagelayout("");
                     cellAttr.setFont_size("");
-                    cellAttr.setFont_family("");
+                    cellAttr.setFont_family("Microsoft YaHei");
                     cellAttr.setFont_color("");
                     cellAttr.setBtop_style(1);
                     cellAttr.setBtop_color("");
@@ -176,9 +170,6 @@ public class Cell {
                     emaintable.put("ec", ec);
 
 //                    System.out.println(ec);
-
-
-
 
 
 //                    LinkedHashMap map = new LinkedHashMap();
@@ -258,31 +249,73 @@ public class Cell {
 
                 // 否则就为普通的td
             } else {
-                LinkedHashMap map = new LinkedHashMap();
+                CellAttr cellAttr = new CellAttr();
                 String colspan = element.attr("colspan");
-                String width = element.attr("width");
-                String align = element.attr("align");
-                String text = element.text();
+                String rowspan = element.attr("colspan");
+
                 Element nextElement = element.nextElementSibling();
                 if (nextElement != null && nextElement.select("input").size() != 0) {
                     for (int i = 0; i < nextElement.select("input").size(); i++) {
-                        String name = nextElement.select("input").get(i).attr("name");
-                        map.put("field", name.substring(5));
+                        cellAttr.setFieldid(nextElement.select("input").get(i).attr("name").substring(5));
+                        cellAttr.setEvalue(element.text());
                     }
                 }
-                map.put("id", mainRow + "," + mainCol);
-                map.put("evalue", text);
-                map.put("colspan", colspan.equals("") ? "1" : colspan);
-                map.put("rowspan", "1");
-                map.put("width", width);
-                map.put("align", align);
-                map.put("etype", "2");
-                if (element.parent().attr("style").equals("display: none")) {
-                    map.put("display", "none");
-                }
-                mainList.add(map);
-                emaintable.put("ec", mainList);
-                etables.put("emaintable", emaintable);
+                cellAttr.setRowid(mainRow);
+                cellAttr.setColid(mainCol);
+                cellAttr.setPrimitivetext("");
+                cellAttr.setColspan(colspan.equals("") ? 1 : Integer.valueOf(colspan));
+                cellAttr.setRowspan(rowspan.equals("") ? 1 : Integer.valueOf(rowspan));
+                cellAttr.setEtype(2); // 2,字段名；3,表单内容
+                cellAttr.setFieldattr(2); // 编辑
+                cellAttr.setFieldtype("1"); // 单行文本框
+                cellAttr.setHalign(1); // 左右居中
+                cellAttr.setValign(1); // 上下居中
+                cellAttr.setBackground_color("");
+                cellAttr.setBackground_image("");
+                cellAttr.setBackground_imagelayout("");
+                cellAttr.setFont_size("");
+                cellAttr.setFont_family("Microsoft YaHei");
+                cellAttr.setFont_color("");
+                cellAttr.setBtop_style(1);
+                cellAttr.setBtop_color("");
+                cellAttr.setBbottom_style(1);
+                cellAttr.setBbottom_color("");
+                cellAttr.setBleft_style(1);
+                cellAttr.setBleft_color("");
+                cellAttr.setBright_style(1);
+                cellAttr.setBright_color("");
+
+                LinkedHashMap map = new LinkedHashMap();
+                LinkedHashMap map2 = new LinkedHashMap();
+                parseSheet.buildDataEcMap(cellAttr, map);
+                parseSheet.buildPluginCellMap(cellAttr, map2);
+                ec.add(map);
+                emaintable.put("ec", ec);
+
+//                String colspan = element.attr("colspan");
+//                String width = element.attr("width");
+//                String align = element.attr("align");
+//                String text = element.text();
+//                Element nextElement = element.nextElementSibling();
+//                if (nextElement != null && nextElement.select("input").size() != 0) {
+//                    for (int i = 0; i < nextElement.select("input").size(); i++) {
+//                        String name = nextElement.select("input").get(i).attr("name");
+//                        map.put("field", name.substring(5));
+//                    }
+//                }
+//                map.put("id", mainRow + "," + mainCol);
+//                map.put("evalue", text);
+//                map.put("colspan", colspan.equals("") ? "1" : colspan);
+//                map.put("rowspan", "1");
+//                map.put("width", width);
+//                map.put("align", align);
+//                map.put("etype", "2");
+//                if (element.parent().attr("style").equals("display: none")) {
+//                    map.put("display", "none");
+//                }
+//                mainList.add(map);
+//                emaintable.put("ec", mainList);
+//                etables.put("emaintable", emaintable);
                 if (!colspan.equals("")) {
                     mainCol += Integer.valueOf(colspan);
                 } else {
