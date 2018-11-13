@@ -1,7 +1,6 @@
 public class CellAttr {
 	private int rowid;
 	private int colid;
-	private String primitivetext = "";
 	private int colspan;
 	private int rowspan;
 	private int etype;
@@ -11,11 +10,8 @@ public class CellAttr {
 	private String evalue = "";
 	private boolean italic = false;
 	private boolean bold = false;
-	private boolean deleteline = false;
-	private boolean underline = false;
 	private int halign;
 	private int valign;
-	private boolean wordwrap = false;
 	private double indent;
 	private String background_color = "";
 	private String background_image = "";
@@ -44,12 +40,6 @@ public class CellAttr {
 	}
 	public void setColid(int colid) {
 		this.colid = colid;
-	}
-	public String getPrimitivetext() {
-		return primitivetext;
-	}
-	public void setPrimitivetext(String primitivetext) {
-		this.primitivetext = primitivetext;
 	}
 	public int getColspan() {
 		return colspan;
@@ -105,18 +95,6 @@ public class CellAttr {
 	public void setBold(boolean bold) {
 		this.bold = bold;
 	}
-	public boolean isDeleteline() {
-		return deleteline;
-	}
-	public void setDeleteline(boolean deleteline) {
-		this.deleteline = deleteline;
-	}
-	public boolean isUnderline() {
-		return underline;
-	}
-	public void setUnderline(boolean underline) {
-		this.underline = underline;
-	}
 	public int getHalign() {
 		return halign;
 	}
@@ -128,12 +106,6 @@ public class CellAttr {
 	}
 	public void setValign(int valign) {
 		this.valign = valign;
-	}
-	public boolean isWordwrap() {
-		return wordwrap;
-	}
-	public void setWordwrap(boolean wordwrap) {
-		this.wordwrap = wordwrap;
 	}
 	public double getIndent() {
 		return indent;

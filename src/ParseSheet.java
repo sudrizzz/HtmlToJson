@@ -45,8 +45,6 @@ public class ParseSheet{
         ec_map.put("font", font_map);
         if(cellattr.isItalic())		font_map.put("italic", "true");
         if(cellattr.isBold())		font_map.put("bold", "true");
-        if(cellattr.isDeleteline())	font_map.put("deleteline", "true");
-        if(cellattr.isUnderline())	font_map.put("underline", "true");
         switch(cellattr.getHalign()){
             case 0:	font_map.put("text-align", "left");	break;
             case 1: font_map.put("text-align", "center"); break;
@@ -57,7 +55,6 @@ public class ParseSheet{
             case 1: font_map.put("valign", "middle"); break;
             case 2: font_map.put("valign", "bottom"); break;
         }
-        if(cellattr.isWordwrap())	font_map.put("autoWrap", "true");
         font_map.put("font-size", cellattr.getFont_size());
         font_map.put("font-family", cellattr.getFont_family());
         font_map.put("color", cellattr.getFont_color());
@@ -124,14 +121,6 @@ public class ParseSheet{
         if(!"".equals(cellattr.getFont_color()))
             cell_style_map.put("foreColor", cellattr.getFont_color());
 
-        cell_style_map.put("wordWrap", cellattr.isWordwrap());
-        if(cellattr.isUnderline()&&cellattr.isDeleteline()){
-            cell_style_map.put("textDecoration", 3);
-        }else if(cellattr.isUnderline()){
-            cell_style_map.put("textDecoration", 1);
-        }else if(cellattr.isDeleteline()){
-            cell_style_map.put("textDecoration", 2);
-        }
         cell_style_map.put("hAlign", cellattr.getHalign());
         cell_style_map.put("vAlign", cellattr.getValign());
 
