@@ -297,7 +297,6 @@ public class Cell {
                         if (nextElement != null && nextElement.select("input").size() != 0) {
                             for (int j = 0; j < nextElement.select("input").size(); j++) {
                                 cellAttr.setFieldid(nextElement.select("input").get(j).attr("name").substring(5));
-                                cellAttr.setEvalue(e.text());
                             }
                         }
                         cellAttr.setRowid(mainRow);
@@ -307,6 +306,7 @@ public class Cell {
                         cellAttr.setEtype(2); // 2,字段名；3,表单内容
                         cellAttr.setFieldattr(2); // 编辑
                         cellAttr.setFieldtype("1"); // 单行文本框
+                        cellAttr.setEvalue(e.text());
                         cellAttr.setHalign(1); // 左右居中
                         cellAttr.setValign(1); // 上下居中
                         cellAttr.setBtop_style(1);
@@ -427,7 +427,7 @@ public class Cell {
                             detailCol++;
                         }
                         // 否则就为普通的td
-                    } else if (!(detailtd.text().trim().equals("")) && !(detailtd.text().trim().equals("&nbsp;"))) {
+                    } else {
                         CellAttr cellAttr = new CellAttr();
                         cellAttr.setEvalue(detailtd.text());
                         cellAttr.setRowid(detailRow);
@@ -437,6 +437,7 @@ public class Cell {
                         cellAttr.setEtype(2); // 2,字段名；3,表单内容
                         cellAttr.setFieldattr(3); // 编辑
                         cellAttr.setFieldtype("1"); // 单行文本框
+                        cellAttr.setEvalue(detailtd.text());
                         cellAttr.setHalign(1); // 左右居中
                         cellAttr.setValign(1); // 上下居中
                         cellAttr.setFont_family("Microsoft YaHei");
