@@ -24,8 +24,6 @@ public class ParseSheet{
     private List<LinkedHashMap<String,Integer>> plugin_combine = new ArrayList<LinkedHashMap<String,Integer>>();
     private Map<String,Object> plugin_data = new LinkedHashMap<String,Object>();
 
-
-
     public void buildDataEcMap(CellAttr cellattr,LinkedHashMap<String,Object> ec_map){
         ec_map.put("id", cellattr.getRowid()+","+cellattr.getColid());
         ec_map.put("rowspan", cellattr.getRowspan()+"");
