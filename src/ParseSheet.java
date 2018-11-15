@@ -29,13 +29,12 @@ public class ParseSheet{
         ec_map.put("rowspan", cellattr.getRowspan()+"");
         ec_map.put("colspan", cellattr.getColspan()+"");
         ec_map.put("etype", cellattr.getEtype()+"");
+        ec_map.put("field", cellattr.getFieldid()+"");
         ec_map.put("evalue", cellattr.getEvalue());
 
         if(cellattr.getEtype()==8||cellattr.getEtype()==9)	return;
         if(cellattr.getEtype()==7)
             ec_map.put("detail", "detail_"+cellattr.getEvalue().replace("明细表", "").replace("明细", ""));
-
-        ec_map.put("field", cellattr.getFieldid()+"");
         ec_map.put("fieldtype", cellattr.getFieldtype());
         if(!"".equals(cellattr.getBackground_color()))
             ec_map.put("backgroundColor", cellattr.getBackground_color());
