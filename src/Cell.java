@@ -38,22 +38,7 @@ public class Cell {
 
     ParseSheet parseSheet = new ParseSheet();
 
-    public LinkedHashMap getTableInfo(String filepath, String encoding) {
-        StringBuffer sb = new StringBuffer();
-        try {
-            // 读取文件将内容转成字符串
-            File file = new File(filepath);
-            FileInputStream fin = new FileInputStream(filepath);
-            InputStreamReader reader = new InputStreamReader(fin, encoding);
-            BufferedReader buffReader = new BufferedReader(reader);
-
-            String strTmp;
-            while ((strTmp = buffReader.readLine()) != null) {
-                sb.append(strTmp);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public LinkedHashMap getTableInfo(StringBuffer sb) {
         Document document = Jsoup.parse(sb.toString());
         int totalWidth = Integer.valueOf(document.selectFirst("table[width]").attr("width"));
         totalCols = Integer.valueOf(document.selectFirst("td[colspan]").attr("colspan"));
@@ -77,7 +62,7 @@ public class Cell {
         getPluginMap("main_sheet", new LinkedHashMap(), pluginMaintableData);
 
         LinkedHashMap jsonMap = new LinkedHashMap();
-        jsonMap.put("datajson", datajsonMap);
+        jsonMap.put("datajson", JSONObject.fromObject(datajsonMap));
         jsonMap.put("pluginjson", JSONObject.fromObject(plugin));
         return jsonMap;
     }
@@ -105,6 +90,38 @@ public class Cell {
                 Element e = element.select("td").get(i);
                 if (e.tag().toString().equals("td")) {
                     if (e.select("table").size() > 0) { // 如果td里面是table，则认为其是明细表，进行特殊处理
+                        if (e.selectFirst("table").select("strong").size() > 0
+                                && e.selectFirst("table").select("button").size() > 0) {
+                            Element detailTitle = e.selectFirst("table").selectFirst("strong").parent();
+                            CellAttr cellAttr = new CellAttr();
+                            cellAttr.setFont_size("12pt");
+                            cellAttr.setBold(true);
+                            getMainTableSpans(cellAttr, detailTitle);
+                            cellAttr.setRowid(++mainRow);
+                            cellAttr.setColid(mainCol);
+                            cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
+                            cellAttr.setEvalue(detailTitle.text());
+                            cellAttr.setHalign(1); // 左右居中
+                            cellAttr.setValign(1); // 上下居中
+                            cellAttr.setFont_color(detailTitle.attr("color"));
+                            cellAttr.setBtop_style(1);
+                            cellAttr.setBtop_color("#90badd");
+                            cellAttr.setBbottom_style(1);
+                            cellAttr.setBbottom_color("#90badd");
+                            cellAttr.setBleft_style(1);
+                            cellAttr.setBleft_color("#90badd");
+                            cellAttr.setBright_style(1);
+                            cellAttr.setBright_color("#90badd");
+
+                            LinkedHashMap map = new LinkedHashMap();
+                            LinkedHashMap map2 = new LinkedHashMap();
+                            parseSheet.buildDataEcMap(cellAttr, map);
+                            parseSheet.buildPluginCellMap(cellAttr, map2);
+                            pluginData.put("" + mainCol, map2);
+                            mainList.add(map);
+                            emaintable.put("ec", mainList);
+                            mainRowheads.put("row_" + mainRow, "30");
+                        }
                         for (Element element1 : element.select("table")) {
                             // 如果该元素下面还有table元素，则继续循环，直到取到最底层的明细table，防止重复
                             if (element1.select("table").size() > 1) {
@@ -152,7 +169,7 @@ public class Cell {
                                 cellAttr.setEtype(3); // 2,字段名；3,表单内容
                             }
                             if (attr.contains("[") && attr.contains("]")) {
-                                cellAttr.setEvalue(attr.substring(attr.indexOf("]")));
+                                cellAttr.setEvalue(attr.substring(attr.indexOf("]") + 1));
                             } else {
                                 cellAttr.setEvalue(attr);
                             }
@@ -160,7 +177,6 @@ public class Cell {
                             cellAttr.setRowid(mainRow);
                             cellAttr.setColid(mainCol);
                             cellAttr.setFieldid(e.select("input").get(j).attr("name").substring(5));
-                            cellAttr.setFieldattr(1); // 1,编辑；2,必填；3,只读
                             cellAttr.setFieldtype(e.select("input").get(j).attr("type")); // 单行文本框
                             cellAttr.setHalign(1); // 左右居中
                             cellAttr.setValign(1); // 上下居中
@@ -199,7 +215,6 @@ public class Cell {
                         cellAttr.setRowid(mainRow);
                         cellAttr.setColid(mainCol);
                         cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
-                        cellAttr.setFieldattr(1); // 1编辑，2必填，3只读
                         cellAttr.setEvalue(e.text());
                         cellAttr.setHalign(1); // 左右居中
                         cellAttr.setValign(1); // 上下居中
@@ -331,7 +346,6 @@ public class Cell {
                     cellAttr.setBold(true);
                     cellAttr.setRowspan(e.attr("rowspan").equals("") ? 1 : Integer.valueOf(e.attr("rowspan")));
                     cellAttr.setEtype(1); // 2,字段名；3,表单内容
-                    cellAttr.setFieldattr(3); // 1编辑，2必填，3只读
                     cellAttr.setEvalue(e.text());
                     cellAttr.setHalign(1); // 左右居中
                     cellAttr.setValign(1); // 上下居中
@@ -403,7 +417,11 @@ public class Cell {
                             cellAttr.setRowspan(1);
                             cellAttr.setFieldid(detailtd.select("input").get(i).attr("name").substring(5));
                             cellAttr.setFieldtype("text"); // 单行文本框
-                            cellAttr.setEvalue(attr.substring(4));
+                            if (attr.contains("[") && attr.contains("]")) {
+                                cellAttr.setEvalue(attr.substring(attr.indexOf("]") + 1));
+                            } else {
+                                cellAttr.setEvalue(attr);
+                            }
                             cellAttr.setHalign(1); // 左右居中
                             cellAttr.setValign(1); // 上下居中
                             cellAttr.setBtop_style(1);
@@ -437,25 +455,29 @@ public class Cell {
                                 cellAttr.setRowid(detailRow);
                                 cellAttr.setColid(detailCol);
                                 LinkedHashMap map = new LinkedHashMap();
+                                LinkedHashMap map2 = new LinkedHashMap();
                                 detail.add(map);
                                 detailMap.put("ec", detail);
-                                parseSheet.buildDataEcMap(cellAttr, map);
-                                detailCol++;
-                            }
-                            detailCol = 0;
-                            for (int i = 0; i < e.select("td").size() + 1; i++) {
-                                CellAttr cellAttr = new CellAttr();
-                                if (i == e.select("td").size()) {
-                                    cellAttr.setEtype(10);
-                                }
-                                cellAttr.setRowid(detailRow);
-                                cellAttr.setColid(detailCol);
-                                LinkedHashMap map = new LinkedHashMap();
                                 pluginData.put("" + detailCol, map);
-                                parseSheet.buildPluginCellMap(cellAttr, map);
+                                parseSheet.buildDataEcMap(cellAttr, map);
+                                parseSheet.buildPluginCellMap(cellAttr, map2);
                                 pluginDetailtableData.put(detailRow + "", pluginData);
                                 detailCol++;
                             }
+//                            detailCol = 0;
+//                            for (int i = 0; i < e.select("td").size() + 1; i++) {
+//                                CellAttr cellAttr = new CellAttr();
+//                                if (i == e.select("td").size()) {
+//                                    cellAttr.setEtype(10);
+//                                }
+//                                cellAttr.setRowid(detailRow);
+//                                cellAttr.setColid(detailCol);
+//                                LinkedHashMap map = new LinkedHashMap();
+//                                pluginData.put("" + detailCol, map);
+//                                parseSheet.buildPluginCellMap(cellAttr, map);
+//                                pluginDetailtableData.put(detailRow + "", pluginData);
+//                                detailCol++;
+//                            }
                             detailRowheads.put("row_" + detailRow, "30");
                             pluginData = new LinkedHashMap();
                             detailRow++;
@@ -493,8 +515,7 @@ public class Cell {
                         cellAttr.setColid(detailCol);
                         cellAttr.setColspan(1);
                         cellAttr.setRowspan(1);
-                        cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
-                        cellAttr.setFieldattr(1); // 编辑
+                        cellAttr.setEtype(2); // 1,文本；2,字段名；3,表单内容
                         cellAttr.setEvalue(detailtd.text());
                         cellAttr.setHalign(1); // 左右居中
                         cellAttr.setValign(1); // 上下居中
@@ -540,7 +561,7 @@ public class Cell {
                     cellAttr.setEtype(9);
                     cellAttr.setEvalue("表尾标识");
                     cellAttr.setBackground_color("#eeeeee");
-                    detailMap.put("edtailinrow", detailRow);
+                    detailMap.put("edtailinrow", detailRow + "");
                     LinkedHashMap mergedCell = new LinkedHashMap();
                     mergedCell.put("row", detailRow);
                     mergedCell.put("rowCount", 1);
@@ -551,7 +572,7 @@ public class Cell {
                     cellAttr.setEtype(8);
                     cellAttr.setEvalue("表头标识");
                     cellAttr.setBackground_color("#eeeeee");
-                    detailMap.put("edtitleinrow", detailRow);
+                    detailMap.put("edtitleinrow", detailRow + "");
                     LinkedHashMap mergedCell = new LinkedHashMap();
                     mergedCell.put("row", detailRow);
                     mergedCell.put("rowCount", 1);
