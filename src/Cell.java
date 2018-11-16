@@ -23,7 +23,7 @@ public class Cell {
     ArrayList mainSpans = new ArrayList(); // 主表合并单元格信息
     ArrayList detailSpans = new ArrayList(); // 明细合并单元格信息
     LinkedHashMap eattr = new LinkedHashMap<>(); // 流程信息
-//    LinkedHashMap formula = new LinkedHashMap(); // 脚本和公式
+    //    LinkedHashMap formula = new LinkedHashMap(); // 脚本和公式
     LinkedHashMap emaintable = new LinkedHashMap(); // 主表字段
     LinkedHashMap etables = new LinkedHashMap(); // 表单内容
     LinkedHashMap<String, Object> plugin = new LinkedHashMap();
@@ -38,7 +38,7 @@ public class Cell {
 
     ParseSheet parseSheet = new ParseSheet();
 
-    public JSONObject getTableInfo(String filepath, String encoding) {
+    public LinkedHashMap getTableInfo(String filepath, String encoding) {
         StringBuffer sb = new StringBuffer();
         try {
             // 读取文件将内容转成字符串
@@ -73,13 +73,13 @@ public class Cell {
         eformdesign.put("eattr", eattr);
         eformdesign.put("etables", etables);
         dataJsonMap.put("eformdesign", eformdesign);
-
-        LinkedHashMap map = recursiveDFS(document);
-
+        LinkedHashMap datajsonMap = recursiveDFS(document);
         getPluginMap("main_sheet", new LinkedHashMap(), pluginMaintableData);
 
-        System.out.println(JSONObject.fromObject(plugin));
-        return JSONObject.fromObject(map);
+        LinkedHashMap jsonMap = new LinkedHashMap();
+        jsonMap.put("datajson", datajsonMap);
+        jsonMap.put("pluginjson", JSONObject.fromObject(plugin));
+        return jsonMap;
     }
 
 
@@ -151,13 +151,17 @@ public class Cell {
                             } else {
                                 cellAttr.setEtype(3); // 2,字段名；3,表单内容
                             }
+                            if (attr.contains("[") && attr.contains("]")) {
+                                cellAttr.setEvalue(attr.substring(attr.indexOf("]")));
+                            } else {
+                                cellAttr.setEvalue(attr);
+                            }
                             getMainTableSpans(cellAttr, e);
                             cellAttr.setRowid(mainRow);
                             cellAttr.setColid(mainCol);
                             cellAttr.setFieldid(e.select("input").get(j).attr("name").substring(5));
                             cellAttr.setFieldattr(1); // 1,编辑；2,必填；3,只读
                             cellAttr.setFieldtype(e.select("input").get(j).attr("type")); // 单行文本框
-                            cellAttr.setEvalue(attr.substring(4));
                             cellAttr.setHalign(1); // 左右居中
                             cellAttr.setValign(1); // 上下居中
                             cellAttr.setBtop_style(1);
@@ -201,6 +205,32 @@ public class Cell {
                         cellAttr.setValign(1); // 上下居中
                         cellAttr.setFont_color(e.attr("color"));
                         cellAttr.setBtop_style(1);
+                        cellAttr.setBtop_color("#90badd");
+                        cellAttr.setBbottom_style(1);
+                        cellAttr.setBbottom_color("#90badd");
+                        cellAttr.setBleft_style(1);
+                        cellAttr.setBleft_color("#90badd");
+                        cellAttr.setBright_style(1);
+                        cellAttr.setBright_color("#90badd");
+
+                        LinkedHashMap map = new LinkedHashMap();
+                        LinkedHashMap map2 = new LinkedHashMap();
+                        parseSheet.buildDataEcMap(cellAttr, map);
+                        parseSheet.buildPluginCellMap(cellAttr, map2);
+                        pluginData.put("" + mainCol, map2);
+                        mainList.add(map);
+                        emaintable.put("ec", mainList);
+                    } else if (e.select("a").size() > 0) { // 超链接
+                        CellAttr cellAttr = new CellAttr();
+                        getMainTableSpans(cellAttr, e);
+                        cellAttr.setRowid(mainRow);
+                        cellAttr.setColid(mainCol);
+                        cellAttr.setEtype(11); // 11,超链接
+                        cellAttr.setEvalue(e.text());
+                        cellAttr.setValign(1); // 上下居中
+                        cellAttr.setFont_color("#0000ee");
+                        cellAttr.setBtop_style(1);
+                        cellAttr.setUnderline(true);
                         cellAttr.setBtop_color("#90badd");
                         cellAttr.setBbottom_style(1);
                         cellAttr.setBbottom_color("#90badd");
@@ -295,6 +325,7 @@ public class Cell {
                         getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(colspanElement.attr("colspan")), "colspan");
                     } else {
                         cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
+                        getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
                     }
                     cellAttr.setFont_size("18pt");
                     cellAttr.setBold(true);

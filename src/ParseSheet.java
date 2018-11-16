@@ -42,6 +42,7 @@ public class ParseSheet{
         ec_map.put("font", font_map);
         if(cellattr.isItalic())		font_map.put("italic", "true");
         if(cellattr.isBold())		font_map.put("bold", "true");
+        if(cellattr.isUnderline())	font_map.put("underline", "true");
         switch(cellattr.getHalign()){
             case 0:	font_map.put("text-align", "left");	break;
             case 1: font_map.put("text-align", "center"); break;

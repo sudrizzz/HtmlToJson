@@ -10,6 +10,7 @@ public class CellAttr {
 	private String evalue = "";
 	private boolean italic = false;
 	private boolean bold = false;
+	private boolean underline = false;
 	private int halign;
 	private int valign;
 	private double indent;
@@ -94,6 +95,12 @@ public class CellAttr {
 	}
 	public void setBold(boolean bold) {
 		this.bold = bold;
+	}
+	public boolean isUnderline() {
+		return underline;
+	}
+	public void setUnderline(boolean underline) {
+		this.underline = underline;
 	}
 	public int getHalign() {
 		return halign;
