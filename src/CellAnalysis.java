@@ -3,14 +3,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class Cell {
+public class CellAnalysis {
 
     int mainRow = 0; // 主表行
     int mainCol = 0; // 主表列
@@ -22,6 +18,7 @@ public class Cell {
     ArrayList detail; // 明细表list
     ArrayList mainSpans = new ArrayList(); // 主表合并单元格信息
     ArrayList detailSpans = new ArrayList(); // 明细合并单元格信息
+    StringBuffer stringBuffer = new StringBuffer();
     LinkedHashMap eattr = new LinkedHashMap<>(); // 流程信息
     //    LinkedHashMap formula = new LinkedHashMap(); // 脚本和公式
     LinkedHashMap emaintable = new LinkedHashMap(); // 主表字段
@@ -37,6 +34,7 @@ public class Cell {
     LinkedHashMap<String, Object> pluginDetailtableData = new LinkedHashMap(); // pluginjson 明细表
 
     ParseSheet parseSheet = new ParseSheet();
+    ExcelSecurity excelSecurity = new ExcelSecurity();
 
     public LinkedHashMap getTableInfo(StringBuffer sb) {
         Document document = Jsoup.parse(sb.toString());
@@ -64,6 +62,7 @@ public class Cell {
         LinkedHashMap jsonMap = new LinkedHashMap();
         jsonMap.put("datajson", JSONObject.fromObject(datajsonMap));
         jsonMap.put("pluginjson", JSONObject.fromObject(plugin));
+        jsonMap.put("script", excelSecurity.encodeStr(stringBuffer.toString()));
         return jsonMap;
     }
 
@@ -72,8 +71,13 @@ public class Cell {
      * 递归取出所有的节点信息，包括字段显示名和标题
      */
     public LinkedHashMap recursiveDFS(Element element) {
-        if (element.tag().toString().equals("tr")
-                && element.child(0).tag().toString().equals("td")
+
+        if (element.tagName().equals("script")) {
+            stringBuffer.append(element.toString());
+        }
+
+        if (element.tagName().equals("tr")
+                && element.child(0).tagName().equals("td")
                 && element.select("table").size() == 0) {
             if (((ArrayList) emaintable.get("ec")).size() != 0) {
                 mainRow++; // 行数加一
@@ -84,43 +88,47 @@ public class Cell {
                 mainRowheads.put("row_0", "30");
             }
         }
-        if (element.tag().toString().equals("tr")) {
+        if (element.tagName().equals("tr")) {
             LinkedHashMap pluginData = new LinkedHashMap();
             for (int i = 0; i < element.select("td").size(); i++) {
                 Element e = element.select("td").get(i);
-                if (e.tag().toString().equals("td")) {
+                if (e.tagName().equals("td")) {
                     if (e.select("table").size() > 0) { // 如果td里面是table，则认为其是明细表，进行特殊处理
                         if (e.selectFirst("table").select("strong").size() > 0
                                 && e.selectFirst("table").select("button").size() > 0) {
                             Element detailTitle = e.selectFirst("table").selectFirst("strong").parent();
-                            CellAttr cellAttr = new CellAttr();
-                            cellAttr.setFont_size("12pt");
-                            cellAttr.setBold(true);
-                            getMainTableSpans(cellAttr, detailTitle);
-                            cellAttr.setRowid(++mainRow);
-                            cellAttr.setColid(mainCol);
-                            cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
-                            cellAttr.setEvalue(detailTitle.text());
-                            cellAttr.setHalign(1); // 左右居中
-                            cellAttr.setValign(1); // 上下居中
-                            cellAttr.setFont_color(detailTitle.attr("color"));
-                            cellAttr.setBtop_style(1);
-                            cellAttr.setBtop_color("#90badd");
-                            cellAttr.setBbottom_style(1);
-                            cellAttr.setBbottom_color("#90badd");
-                            cellAttr.setBleft_style(1);
-                            cellAttr.setBleft_color("#90badd");
-                            cellAttr.setBright_style(1);
-                            cellAttr.setBright_color("#90badd");
+                            if (!detailTitle.text().equalsIgnoreCase("&nbsp;")
+                                && !detailTitle.text().equalsIgnoreCase("&nbsp")
+                                && !detailTitle.text().equalsIgnoreCase("")) {
+                                CellAttr cellAttr = new CellAttr();
+                                cellAttr.setFont_size("12pt");
+                                cellAttr.setBold(true);
+                                getMainTableSpans(cellAttr, detailTitle);
+                                cellAttr.setRowid(++mainRow);
+                                cellAttr.setColid(mainCol);
+                                cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
+                                cellAttr.setEvalue(detailTitle.text());
+                                cellAttr.setHalign(1); // 左右居中
+                                cellAttr.setValign(1); // 上下居中
+                                cellAttr.setFont_color(detailTitle.attr("color"));
+                                cellAttr.setBtop_style(1);
+                                cellAttr.setBtop_color("#90badd");
+                                cellAttr.setBbottom_style(1);
+                                cellAttr.setBbottom_color("#90badd");
+                                cellAttr.setBleft_style(1);
+                                cellAttr.setBleft_color("#90badd");
+                                cellAttr.setBright_style(1);
+                                cellAttr.setBright_color("#90badd");
 
-                            LinkedHashMap map = new LinkedHashMap();
-                            LinkedHashMap map2 = new LinkedHashMap();
-                            parseSheet.buildDataEcMap(cellAttr, map);
-                            parseSheet.buildPluginCellMap(cellAttr, map2);
-                            pluginData.put("" + mainCol, map2);
-                            mainList.add(map);
-                            emaintable.put("ec", mainList);
-                            mainRowheads.put("row_" + mainRow, "30");
+                                LinkedHashMap map = new LinkedHashMap();
+                                LinkedHashMap map2 = new LinkedHashMap();
+                                parseSheet.buildDataEcMap(cellAttr, map);
+                                parseSheet.buildPluginCellMap(cellAttr, map2);
+                                pluginData.put("" + mainCol, map2);
+                                mainList.add(map);
+                                emaintable.put("ec", mainList);
+                                mainRowheads.put("row_" + mainRow, "30");
+                            }
                         }
                         for (Element element1 : element.select("table")) {
                             // 如果该元素下面还有table元素，则继续循环，直到取到最底层的明细table，防止重复
@@ -128,7 +136,7 @@ public class Cell {
                                 continue;
                             }
                             detail = new ArrayList();
-                            LinkedHashMap map = detailTableAnalyse(element1);
+                            LinkedHashMap map = detailTableAnalysis(element1);
                             if (map.size() != 0) {
                                 etables.put("detail_" + ++detailCount, map);
                                 getPluginMap("detail_" + detailCount + "_sheet", new LinkedHashMap(), pluginDetailtableData);
@@ -318,7 +326,7 @@ public class Cell {
     /**
      * 单独处理明细表
      */
-    private LinkedHashMap detailTableAnalyse(Element element) {
+    private LinkedHashMap detailTableAnalysis(Element element) {
         LinkedHashMap detailMap = new LinkedHashMap();
         if (element.select("strong").size() > 0 && !(element.text().trim().equals(""))) {
             LinkedHashMap pluginData = new LinkedHashMap();
@@ -326,7 +334,7 @@ public class Cell {
                 if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
                     return etables;
                 }
-                if (e.tag().toString().equals("strong")) {
+                if (e.tagName().equals("strong")) {
                     e = e.parent();
                     Element colspanElement = e;
                     CellAttr cellAttr = new CellAttr();
@@ -464,20 +472,6 @@ public class Cell {
                                 pluginDetailtableData.put(detailRow + "", pluginData);
                                 detailCol++;
                             }
-//                            detailCol = 0;
-//                            for (int i = 0; i < e.select("td").size() + 1; i++) {
-//                                CellAttr cellAttr = new CellAttr();
-//                                if (i == e.select("td").size()) {
-//                                    cellAttr.setEtype(10);
-//                                }
-//                                cellAttr.setRowid(detailRow);
-//                                cellAttr.setColid(detailCol);
-//                                LinkedHashMap map = new LinkedHashMap();
-//                                pluginData.put("" + detailCol, map);
-//                                parseSheet.buildPluginCellMap(cellAttr, map);
-//                                pluginDetailtableData.put(detailRow + "", pluginData);
-//                                detailCol++;
-//                            }
                             detailRowheads.put("row_" + detailRow, "30");
                             pluginData = new LinkedHashMap();
                             detailRow++;
@@ -598,66 +592,10 @@ public class Cell {
             return detailMap;
         }
         for (Element e : element.children()) {
-            detailTableAnalyse(e);
+            detailTableAnalysis(e);
         }
         return detailMap;
     }
-
-
-//    /**
-//     * 取出表单关联的js,css
-//     *
-//     * @param element
-//     * @return
-//     */
-//    int count = 0;
-//
-//    public LinkedHashMap getCssAndScript(Element element) {
-//        LinkedHashMap linkMap = new LinkedHashMap();
-//        LinkedHashMap scriptMap = new LinkedHashMap();
-//        int i = 0;
-//
-//        if (element.select("link").size() != 0
-//                || element.select("script").size() != 0) {
-//            for (Element e : element.select("link")) {
-//                linkMap.put(i++, e.toString());
-//            }
-//            i = 0;
-//            for (Element e : element.select("script")) {
-//                scriptMap.put(i++, e.toString());
-//            }
-//        }
-//        formula.put("link", linkMap);
-//        formula.put("script", scriptMap);
-//        return formula;
-//    }
-
-
-//    /**
-//     * 获取每一列的宽度
-//     * 总宽度除以标题栏的colspan值即为每一列的宽度
-//     *
-//     * @param element
-//     * @return
-//     */
-//    public LinkedHashMap getEveryColWidth(Element element) {
-//        LinkedHashMap detailColheads = new LinkedHashMap(); // 明细表列宽
-//        Integer totalWidth = 0;
-//        Integer colspan = 0;
-//
-//        for (Element e : element.getElementsByClass("table")) {
-//
-//            if (e.tag().toString().equals("table") && e.hasClass("table")) {
-//                totalWidth = Integer.valueOf(element.attr("width"));
-//                colspan = Integer.valueOf(element.selectFirst("td").attr("colspan"));
-//                String perColWidth = (totalWidth / colspan) + "";
-//                for (int i = 0; i < colspan; i++) {
-//                    detailColheads.put("col_", perColWidth);
-//                }
-//            }
-//        }
-//        return detailColheads;
-//    }
 
 
     /**
@@ -722,7 +660,6 @@ public class Cell {
         LinkedHashMap dataTable = new LinkedHashMap();
         dataTable.put("dataTable", data);
         Sheet1.put("columns", getPluginColumns(str, data));
-//        Sheet1.put("mainSpans", getPlugin_combine());
         Sheet1.put("data", dataTable);
 
 
@@ -765,17 +702,6 @@ public class Cell {
         return list;
     }
 
-
-//    private ArrayList getPlugin_combine() {
-//        ArrayList list = new ArrayList();
-//        LinkedHashMap<String, Object> plugin_column = new LinkedHashMap<String, Object>();
-//        plugin_column.put("row", "0");
-//        plugin_column.put("rowCount", "1");
-//        plugin_column.put("col", "0");
-//        plugin_column.put("colCount", "6");
-//        list.add(plugin_column);
-//        return list;
-//    }
 
     /**
      * 在主表中生成明细索引

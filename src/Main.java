@@ -7,8 +7,8 @@ public class Main {
 
     public static void main(String[] args) {
         StringBuffer sb = new StringBuffer();
-        String filepath = "layout3.html";
-        String encoding = "GBK";
+        String filepath = "layout6.html";
+        String encoding = "UTF-8";
 
         try {
             // 读取文件将内容转成字符串
@@ -17,15 +17,17 @@ public class Main {
             BufferedReader buffReader = new BufferedReader(reader);
             String strTmp;
             while ((strTmp = buffReader.readLine()) != null) {
-                sb.append(strTmp);
+                sb.append(strTmp + "\r\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Cell cell = new Cell();
-        LinkedHashMap map = cell.getTableInfo(sb);
+        CellAnalysis cellAnalysis = new CellAnalysis();
+        ExcelSecurity excelSecurity = new ExcelSecurity();
+        LinkedHashMap map = cellAnalysis.getTableInfo(sb);
         System.out.println(map.get("datajson"));
         System.out.println(map.get("pluginjson"));
+        System.out.println(map.get("script"));
     }
 }
