@@ -7,8 +7,8 @@ public class Main {
 
     public static void main(String[] args) {
         StringBuffer sb = new StringBuffer();
-        String filepath = "layout6.html";
-        String encoding = "UTF-8";
+        String filepath = "htmllay144_574_0.html";
+        String encoding = "GBk";
 
         try {
             // 读取文件将内容转成字符串
@@ -26,7 +26,7 @@ public class Main {
         CellAnalysis cellAnalysis = new CellAnalysis();
         ExcelSecurity excelSecurity = new ExcelSecurity();
         LinkedHashMap map = cellAnalysis.getTableInfo(sb);
-        System.out.println(map.get("datajson"));
+        System.out.println(map.get("datajson").toString());
         System.out.println(map.get("pluginjson"));
         System.out.println(map.get("script"));
     }

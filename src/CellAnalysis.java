@@ -103,9 +103,8 @@ public class CellAnalysis {
                                 CellAttr cellAttr = new CellAttr();
                                 cellAttr.setFont_size("12pt");
                                 cellAttr.setBold(true);
-                                getMainTableSpans(cellAttr, detailTitle);
                                 cellAttr.setRowid(++mainRow);
-                                cellAttr.setColid(mainCol);
+                                cellAttr.setColid(0);
                                 cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
                                 cellAttr.setEvalue(detailTitle.text());
                                 cellAttr.setHalign(1); // 左右居中
@@ -119,12 +118,14 @@ public class CellAnalysis {
                                 cellAttr.setBleft_color("#90badd");
                                 cellAttr.setBright_style(1);
                                 cellAttr.setBright_color("#90badd");
+                                getMainTableSpans(cellAttr, detailTitle);
 
                                 LinkedHashMap map = new LinkedHashMap();
                                 LinkedHashMap map2 = new LinkedHashMap();
                                 parseSheet.buildDataEcMap(cellAttr, map);
                                 parseSheet.buildPluginCellMap(cellAttr, map2);
-                                pluginData.put("" + mainCol, map2);
+                                pluginData.put("" + 0, map2);
+                                pluginMaintableData.put(mainRow + "", pluginData);
                                 mainList.add(map);
                                 emaintable.put("ec", mainList);
                                 mainRowheads.put("row_" + mainRow, "30");
@@ -143,9 +144,8 @@ public class CellAnalysis {
                                 getdetailTableCell("detail_" + detailCount);
 
                                 CellAttr cellAttr = new CellAttr();
-                                getMainTableSpans(cellAttr, e);
                                 cellAttr.setRowid(mainRow);
-                                cellAttr.setColid(mainCol);
+                                cellAttr.setColid(0);
                                 cellAttr.setEvalue("明细表" + detailCount);
                                 cellAttr.setValign(1); // 上下居中
                                 cellAttr.setBackground_color("#e7f3fc");
@@ -157,10 +157,12 @@ public class CellAnalysis {
                                 cellAttr.setBleft_color("#90badd");
                                 cellAttr.setBright_style(1);
                                 cellAttr.setBright_color("#90badd");
+                                getMainTableSpans(cellAttr, e);
 
                                 LinkedHashMap map2 = new LinkedHashMap();
+                                pluginData = new LinkedHashMap();
                                 parseSheet.buildPluginCellMap(cellAttr, map2);
-                                pluginData.put("" + mainCol, map2);
+                                pluginData.put("" + 0, map2);
                                 pluginMaintableData.put(mainRow + "", pluginData);
                                 detailSpans = new ArrayList(); // 重置明细表的列合并信息
                             }
@@ -181,7 +183,6 @@ public class CellAnalysis {
                             } else {
                                 cellAttr.setEvalue(attr);
                             }
-                            getMainTableSpans(cellAttr, e);
                             cellAttr.setRowid(mainRow);
                             cellAttr.setColid(mainCol);
                             cellAttr.setFieldid(e.select("input").get(j).attr("name").substring(5));
@@ -196,6 +197,7 @@ public class CellAnalysis {
                             cellAttr.setBleft_color("#90badd");
                             cellAttr.setBright_style(1);
                             cellAttr.setBright_color("#90badd");
+                            getMainTableSpans(cellAttr, e);
 
                             LinkedHashMap map = new LinkedHashMap();
                             LinkedHashMap map2 = new LinkedHashMap();
@@ -219,9 +221,8 @@ public class CellAnalysis {
                             cellAttr.setFont_size("12pt");
                         }
                         cellAttr.setBold(true);
-                        getMainTableSpans(cellAttr, e);
                         cellAttr.setRowid(mainRow);
-                        cellAttr.setColid(mainCol);
+                        cellAttr.setColid(0);
                         cellAttr.setEtype(1); // 1,文本；2,字段名；3,表单内容
                         cellAttr.setEvalue(e.text());
                         cellAttr.setHalign(1); // 左右居中
@@ -235,6 +236,7 @@ public class CellAnalysis {
                         cellAttr.setBleft_color("#90badd");
                         cellAttr.setBright_style(1);
                         cellAttr.setBright_color("#90badd");
+                        getMainTableSpans(cellAttr, e);
 
                         LinkedHashMap map = new LinkedHashMap();
                         LinkedHashMap map2 = new LinkedHashMap();
@@ -245,7 +247,6 @@ public class CellAnalysis {
                         emaintable.put("ec", mainList);
                     } else if (e.select("a").size() > 0) { // 超链接
                         CellAttr cellAttr = new CellAttr();
-                        getMainTableSpans(cellAttr, e);
                         cellAttr.setRowid(mainRow);
                         cellAttr.setColid(mainCol);
                         cellAttr.setEtype(11); // 11,超链接
@@ -261,6 +262,7 @@ public class CellAnalysis {
                         cellAttr.setBleft_color("#90badd");
                         cellAttr.setBright_style(1);
                         cellAttr.setBright_color("#90badd");
+                        getMainTableSpans(cellAttr, e);
 
                         LinkedHashMap map = new LinkedHashMap();
                         LinkedHashMap map2 = new LinkedHashMap();
@@ -271,7 +273,6 @@ public class CellAnalysis {
                         emaintable.put("ec", mainList);
                     } else { // 否则就为普通的td
                         CellAttr cellAttr = new CellAttr();
-                        getMainTableSpans(cellAttr, e);
                         String colspan = e.attr("colspan");
                         Element nextElement = e.nextElementSibling();
                         if (nextElement != null && nextElement.select("input").size() > 0) {
@@ -294,6 +295,7 @@ public class CellAnalysis {
                         cellAttr.setBleft_color("#90badd");
                         cellAttr.setBright_style(1);
                         cellAttr.setBright_color("#90badd");
+                        getMainTableSpans(cellAttr, e);
 
                         LinkedHashMap map = new LinkedHashMap();
                         LinkedHashMap map2 = new LinkedHashMap();
@@ -709,7 +711,7 @@ public class CellAnalysis {
     private void getdetailTableCell(String str) {
         CellAttr cellAttr = new CellAttr();
         cellAttr.setRowid(++mainRow);
-        cellAttr.setColid(mainCol);
+        cellAttr.setColid(0);
         cellAttr.setColspan(totalCols);
         cellAttr.setEtype(7); // 明细
         cellAttr.setEvalue(str.substring(7));
@@ -758,15 +760,21 @@ public class CellAnalysis {
      * 获取主表colspan和rowspan信息
      */
     private void getMainTableSpans(CellAttr cellAttr, Element e) {
-        boolean hasColspan = e.attr("colspan").equals("");
-        boolean hasRowspan = e.attr("rowspan").equals("");
-        if (!hasColspan) {
+        if (e.select("strong").size() > 0) {
+            cellAttr.setColspan(totalCols);
+            cellAttr.setRowspan(1);
+            getMergedCellsInfo(mainRow, 0, totalCols, "colspan");
+            return;
+        }
+        boolean hasColspan = !e.attr("colspan").equals("");
+        boolean hasRowspan = !e.attr("rowspan").equals("");
+        if (hasColspan) {
             getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
             cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
         } else {
             cellAttr.setColspan(1);
         }
-        if (!hasRowspan) {
+        if (hasRowspan) {
             getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "rowspan");
             cellAttr.setRowspan(Integer.valueOf(e.attr("rowspan")));
         } else {
