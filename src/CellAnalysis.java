@@ -2,6 +2,7 @@ import net.sf.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -143,6 +144,9 @@ public class CellAnalysis {
                         for (Element element1 : element.select("table")) {
                             // 如果该元素下面还有table元素，则继续循环，直到取到最底层的明细table，防止重复
                             if (element1.select("table").size() > 1) {
+                                continue;
+                            }
+                            if (element1.select("strong").size() == 0 && element1.select("input").size() == 0) {
                                 continue;
                             }
                             detail = new ArrayList();
@@ -295,50 +299,54 @@ public class CellAnalysis {
      */
     private LinkedHashMap detailTableAnalysis(Element element) {
         LinkedHashMap detailMap = new LinkedHashMap();
-        if (element.select("strong").size() > 0 && !(element.text().trim().equals(""))) {
+        if (element.select("input").size() <= 1
+                && element.select("strong").size() > 0
+                && !(element.text().trim().equals(""))) {
             LinkedHashMap pluginData = new LinkedHashMap();
-            for (Element e : element.children()) { // 表单标题
-                if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
-                    return etables;
-                }
-                if (e.tagName().equals("strong")) {
-                    e = e.parent();
-                    Element colspanElement = e;
-                    CellAttr cellAttr = createCell();
-                    cellAttr.setRowid(mainRow);
-                    cellAttr.setColid(0);
-                    if (e.attr("colspan").equals("")) {
-                        while (colspanElement.attr("colspan").equals("")) {
-                            colspanElement = colspanElement.parent();
-                        }
-                        cellAttr.setColspan(Integer.valueOf(colspanElement.attr("colspan")));
-                        getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(colspanElement.attr("colspan")), "colspan");
-                    } else {
-                        cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
-                        getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
+            Element e = element.selectFirst("strong");
+            if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
+                return etables;
+            }
+            if (e.tagName().equals("strong")) {
+                e = e.parent();
+                Element colspanElement = e;
+                CellAttr cellAttr = createCell();
+                cellAttr.setRowid(mainRow);
+                cellAttr.setColid(0);
+                if (e.attr("colspan").equals("")) {
+                    while (colspanElement.attr("colspan").equals("")) {
+                        colspanElement = colspanElement.parent();
                     }
-                    cellAttr.setFont_size("24pt");
-                    cellAttr.setBold(true);
-                    cellAttr.setRowspan(e.attr("rowspan").equals("") ? 1 : Integer.valueOf(e.attr("rowspan")));
-                    cellAttr.setEtype(1); // 2,字段名；3,表单内容
-                    cellAttr.setEvalue(e.text());
-                    cellAttr.setFont_color(e.attr("color"));
-
-                    LinkedHashMap map = new LinkedHashMap();
-                    LinkedHashMap map2 = new LinkedHashMap();
-                    parseSheet.buildDataEcMap(cellAttr, map);
-                    parseSheet.buildPluginCellMap(cellAttr, map2);
-                    pluginData.put("" + mainCol, map2);
-                    mainList.add(map);
-                    pluginMaintableData.put(mainRow + "", pluginData);
-                    emaintable.put("ec", mainList);
+                    cellAttr.setColspan(Integer.valueOf(colspanElement.attr("colspan")));
+                    getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(colspanElement.attr("colspan")), "colspan");
+                } else {
+                    cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
+                    getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
                 }
+                cellAttr.setFont_size("24pt");
+                cellAttr.setBold(true);
+                cellAttr.setRowspan(e.attr("rowspan").equals("") ? 1 : Integer.valueOf(e.attr("rowspan")));
+                cellAttr.setEtype(1); // 2,字段名；3,表单内容
+                cellAttr.setEvalue(e.text());
+                cellAttr.setFont_color(e.attr("color"));
+
+                LinkedHashMap map = new LinkedHashMap();
+                LinkedHashMap map2 = new LinkedHashMap();
+                parseSheet.buildDataEcMap(cellAttr, map);
+                parseSheet.buildPluginCellMap(cellAttr, map2);
+                pluginData.put("" + mainCol, map2);
+                mainList.add(map);
+                pluginMaintableData.put(mainRow + "", pluginData);
+                emaintable.put("ec", mainList);
             }
         } else {
             pluginDetailtableData = new LinkedHashMap<>();
             for (Element e : element.select("tr")) {
                 LinkedHashMap pluginData = new LinkedHashMap();
                 int maxColumn = 0;
+                if (e.childNodeSize() <= 1) {
+                    continue;
+                }
                 for (Element detailtd : e.select("td")) {
                     if (checkForDisplayNone(detailtd)) {
                         continue;
@@ -442,9 +450,16 @@ public class CellAnalysis {
                         cellAttr.setColspan(1);
                         cellAttr.setRowspan(1);
                         cellAttr.setEtype(2); // 1,文本；2,字段名；3,表单内容
-                        cellAttr.setFieldid(detailtd.parent().parent().select("tr").get(1).select("td").get(detailCol - 1).selectFirst("input").attr("name").substring(5));
                         cellAttr.setEvalue(detailtd.text());
-
+                        Element lastTr = detailtd.parent().lastElementSibling();
+                        while (lastTr != null && lastTr.select("td[style=display: none]").size() > 0
+                                && lastTr.select("td[style=display: none]").size() == lastTr.select("td").size()) {
+                            lastTr = lastTr.previousElementSibling();
+                        }
+                        int eee = lastTr.select("td").get(detailCol - 1).select("input").size();
+                        if (lastTr != null && lastTr.select("td").get(detailCol - 1).select("input").size() > 0) {
+                            cellAttr.setFieldid(lastTr.select("td").get(detailCol - 1).selectFirst("input").attr("name").substring(5));
+                        }
                         if (cellAttr.getEvalue().contains("序号")) {
                             detailColheads.put("col_" + detailCol, "50");
                         } else {
@@ -478,6 +493,7 @@ public class CellAnalysis {
                     if (detailMapList.size() > maxColumn * 2) {
                         cellAttr.setEtype(9);
                         cellAttr.setEvalue("表尾标识");
+                        cellAttr.setValign(1);
                         cellAttr.setBackground_color("#eeeeee");
                         detailMap.put("edtailinrow", detailRow + "");
                         LinkedHashMap mergedCell = new LinkedHashMap();
@@ -489,6 +505,7 @@ public class CellAnalysis {
                     } else {
                         cellAttr.setEtype(8);
                         cellAttr.setEvalue("表头标识");
+                        cellAttr.setValign(1);
                         cellAttr.setBackground_color("#eeeeee");
                         detailMap.put("edtitleinrow", detailRow + "");
                         LinkedHashMap mergedCell = new LinkedHashMap();
@@ -700,8 +717,13 @@ public class CellAnalysis {
             if (mainCol == totalCols) {
                 mainCol = 0;
             }
-            getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
-            cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
+            if (mainCol + Integer.valueOf(e.attr("colspan")) > totalCols) {
+                getMergedCellsInfo(mainRow, mainCol, totalCols - mainCol, "colspan");
+                cellAttr.setColspan(totalCols - mainCol);
+            } else {
+                getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
+                cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
+            }
         } else {
             cellAttr.setColspan(1);
         }
