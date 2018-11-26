@@ -84,7 +84,13 @@ public class CellAnalysis {
      */
     public LinkedHashMap recursiveDFS(Element element) {
 
-        if (element.tagName().equals("tr") && element.text().trim().equals("")) {
+        if (element.tagName().equals("tr") && element.nextElementSibling() == null) {
+            Elements eee = element.getElementsByTag("table");
+            for (Element e : element.getElementsByTag("table")) {
+                recursiveDFS(e);
+            }
+        }
+        if (element.tagName().equals("tr") && element.childNodeSize() == 0) {
             return dataJsonMap;
         }
         if (element.tagName().equals("script")) {
@@ -167,17 +173,18 @@ public class CellAnalysis {
                                 LinkedHashMap map2 = new LinkedHashMap();
                                 pluginData = new LinkedHashMap();
                                 parseSheet.buildPluginCellMap(cellAttr, map2);
-                                pluginData.put("" + 0, map2);
+                                pluginData.put("0", map2);
                                 pluginMaintableData.put(mainRow + "", pluginData);
                                 detailSpans = new ArrayList(); // 重置明细表的列合并信息
                             }
                         }
                         return etables;
                         // 如果td里面是input框，则针对input框进行处理
-                    } else if (e.select("input").size() > 0) {
-                        for (int j = 0; j < e.select("input").size(); j++) {
+                    } else if (e.getElementsByClass("InputStyle").size() > 0) {
+                        Elements inputs = e.getElementsByClass("InputStyle");
+                        for (int j = 0; j < inputs.size(); j++) {
                             CellAttr cellAttr = createCell();
-                            String attr = e.select("input").get(j).val();
+                            String attr = inputs.get(j).val();
                             if (attr.contains("序号")) {
                                 cellAttr.setEtype(22); // 22,序号
                             } else {
@@ -190,8 +197,8 @@ public class CellAnalysis {
                             }
                             cellAttr.setRowid(mainRow);
                             cellAttr.setColid(mainCol);
-                            cellAttr.setFieldid(e.select("input").get(j).attr("name").substring(5));
-                            cellAttr.setFieldtype(e.select("input").get(j).attr("type")); // 单行文本框
+                            cellAttr.setFieldid(inputs.get(j).attr("name").substring(5));
+                            cellAttr.setFieldtype(inputs.get(j).attr("type")); // 单行文本框
                             getMainTableSpans(cellAttr, e);
 
                             LinkedHashMap map = new LinkedHashMap();
@@ -208,7 +215,7 @@ public class CellAnalysis {
                             mainCol++;
                         }
                         // 如果里面有strong标签，则作为明细标题处理
-                    } else if (e.select("strong").size() > 0 && element.getElementsByClass("tr").size() == 0) {
+                    } else if (e.select("strong").size() > 0 && e.select("tr").size() == 0) {
                         CellAttr cellAttr = createCell();
                         if (e.select("font").size() > 0) {
                             cellAttr.setFont_size(e.selectFirst("font").attr("size"));
@@ -234,34 +241,31 @@ public class CellAnalysis {
                         pluginData.put("" + mainCol, map2);
                         mainList.add(map);
                         emaintable.put("ec", mainList);
-                    } else if (e.select("a").size() > 0) { // 超链接
-                        CellAttr cellAttr = createCell();
-                        cellAttr.setRowid(mainRow);
-                        cellAttr.setColid(mainCol);
-                        cellAttr.setEtype(11); // 11,超链接
-                        cellAttr.setEvalue(e.text());
-                        cellAttr.setFont_color("#0000ee");
-                        getMainTableSpans(cellAttr, e);
 
-                        LinkedHashMap map = new LinkedHashMap();
-                        LinkedHashMap map2 = new LinkedHashMap();
-                        parseSheet.buildDataEcMap(cellAttr, map);
-                        parseSheet.buildPluginCellMap(cellAttr, map2);
-                        pluginData.put("" + mainCol, map2);
-                        mainList.add(map);
-                        emaintable.put("ec", mainList);
-                    } else { // 否则就为普通的td
+                    } else if (e.select("strong").size() == 0
+                            && e.getElementsByClass("InputStyle").size() == 0) { // 否则就为普通的td
                         CellAttr cellAttr = createCell();
                         String colspan = e.attr("colspan");
-                        Element nextElement = e.nextElementSibling();
-                        if (nextElement != null && nextElement.select("input").size() > 0) {
-                            for (int j = 0; j < nextElement.select("input").size(); j++) {
-                                cellAttr.setFieldid(nextElement.select("input").get(j).attr("name").substring(5));
+                        if (e.getElementsByClass("Label").size() > 0) {
+                            cellAttr.setFieldid(e.getElementsByClass("Label").attr("name").substring(5));
+                        } else {
+                            Element nextElement = e.nextElementSibling();
+                            if (nextElement != null) {
+                                Elements inputs = nextElement.getElementsByClass("InputStyle");
+                                if (inputs.size() > 0) {
+                                    for (int j = 0; j < inputs.size(); j++) {
+                                        cellAttr.setFieldid(inputs.get(j).attr("name").substring(5));
+                                    }
+                                }
                             }
+                        }
+                        if (e.select("a").size() > 0) {
+                            cellAttr.setEtype(11);
+                        } else {
+                            cellAttr.setEtype(2);
                         }
                         cellAttr.setRowid(mainRow);
                         cellAttr.setColid(mainCol);
-                        cellAttr.setEtype(2); // 2,字段名；3,表单内容
                         cellAttr.setEvalue(e.text());
                         cellAttr.setBackground_color("#e7f3fc");
                         getMainTableSpans(cellAttr, e);
@@ -351,7 +355,8 @@ public class CellAnalysis {
                     if (checkForDisplayNone(detailtd)) {
                         continue;
                     }
-                    if (detailtd.select("input").size() > 0) {
+                    if (detailtd.getElementsByClass("InputStyle").size() > 0) {
+                        Elements inputs = detailtd.getElementsByClass("InputStyle");
                         if (detailCol == 0) {
                             CellAttr cellAttr = createCell();
                             cellAttr.setRowid(detailRow);
@@ -370,9 +375,9 @@ public class CellAnalysis {
                             pluginDetailtableData.put(detailRow + "", pluginData);
                             detailCol++;
                         }
-                        for (int i = 0; i < detailtd.select("input").size(); i++) {
+                        for (int i = 0; i < inputs.size(); i++) {
                             CellAttr cellAttr = createCell();
-                            String attr = detailtd.select("input").get(i).val();
+                            String attr = inputs.get(i).val();
                             if (attr.contains("序号")) {
                                 cellAttr.setEtype(22); // 22,序号
                             } else {
@@ -382,7 +387,7 @@ public class CellAnalysis {
                             cellAttr.setColid(detailCol);
                             cellAttr.setColspan(1);
                             cellAttr.setRowspan(1);
-                            cellAttr.setFieldid(detailtd.select("input").get(i).attr("name").substring(5));
+                            cellAttr.setFieldid(inputs.get(i).attr("name").substring(5));
                             cellAttr.setFieldtype("text"); // 单行文本框
                             if (attr.contains("[") && attr.contains("]")) {
                                 cellAttr.setEvalue(attr.substring(attr.indexOf("]") + 1));
@@ -453,12 +458,16 @@ public class CellAnalysis {
                         cellAttr.setEtype(2); // 1,文本；2,字段名；3,表单内容
                         cellAttr.setEvalue(detailtd.text());
                         Element lastTr = detailtd.parent().lastElementSibling();
-                        while (lastTr != null && lastTr.select("td[style=display: none]").size() > 0
-                                && lastTr.select("td[style=display: none]").size() == lastTr.select("td").size()) {
-                            lastTr = lastTr.previousElementSibling();
-                        }
-                        if (lastTr != null && lastTr.select("td").get(detailCol - 1).select("input").size() > 0) {
-                            cellAttr.setFieldid(lastTr.select("td").get(detailCol - 1).selectFirst("input").attr("name").substring(5));
+                        if (e.getElementsByClass("Label").size() > 0) {
+                            cellAttr.setFieldid(e.getElementsByClass("Label").attr("name").substring(5));
+                        } else {
+                            while (lastTr != null && lastTr.select("td[style=display: none]").size() > 0
+                                    && lastTr.select("td[style=display: none]").size() == lastTr.select("td").size()) {
+                                lastTr = lastTr.previousElementSibling();
+                            }
+                            if (lastTr != null && lastTr.select("td").get(detailCol - 1).getElementsByClass("InputStyle").size() > 0) {
+                                cellAttr.setFieldid(lastTr.select("td").get(detailCol - 1).getElementsByClass("InputStyle").attr("name").substring(5));
+                            }
                         }
                         if (cellAttr.getEvalue().contains("序号")) {
                             detailColheads.put("col_" + detailCol, "50");
