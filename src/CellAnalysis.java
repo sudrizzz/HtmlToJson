@@ -99,7 +99,7 @@ public class CellAnalysis {
             mainCol = 0; // 列归零
             mainRowheads.put("row_" + mainRow, "30");
             if (!mainRowheads.containsKey("row_0")) {
-                mainRowheads.put("row_0", "90");
+                mainRowheads.put("row_0", "60");
             }
         }
         if (element.tagName().equals("tr")) {
@@ -118,8 +118,8 @@ public class CellAnalysis {
                                 && e.selectFirst("table").select("button").size() > 0) {
                             Element detailTitle = e.selectFirst("table").selectFirst("strong").parent();
                             if (!detailTitle.text().equalsIgnoreCase("&nbsp;")
-                                && !detailTitle.text().equalsIgnoreCase("&nbsp")
-                                && !detailTitle.text().equalsIgnoreCase("")) {
+                                    && !detailTitle.text().equalsIgnoreCase("&nbsp")
+                                    && !detailTitle.text().equalsIgnoreCase("")) {
                                 CellAttr cellAttr = createCell();
                                 cellAttr.setFont_size("12pt");
                                 cellAttr.setBold(true);
@@ -299,45 +299,45 @@ public class CellAnalysis {
      */
     private LinkedHashMap detailTableAnalysis(Element element) {
         LinkedHashMap detailMap = new LinkedHashMap();
-        if (element.select("input").size() <= 1
-                && element.select("strong").size() > 0
-                && !(element.text().trim().equals(""))) {
-            LinkedHashMap pluginData = new LinkedHashMap();
-            Element e = element.selectFirst("strong");
-            if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
-                return etables;
-            }
-            if (e.tagName().equals("strong")) {
-                e = e.parent();
-                Element colspanElement = e;
-                CellAttr cellAttr = createCell();
-                cellAttr.setRowid(mainRow);
-                cellAttr.setColid(0);
-                if (e.attr("colspan").equals("")) {
-                    while (colspanElement.attr("colspan").equals("")) {
-                        colspanElement = colspanElement.parent();
-                    }
-                    cellAttr.setColspan(Integer.valueOf(colspanElement.attr("colspan")));
-                    getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(colspanElement.attr("colspan")), "colspan");
-                } else {
-                    cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
-                    getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
+        if (element.select("strong").size() > 0) {
+            if (element.select("input").size() <= 1 && mainList.size() == 0) {
+                LinkedHashMap pluginData = new LinkedHashMap();
+                Element e = element.selectFirst("strong");
+                if ((e.text().trim().equals("")) || (e.text().trim().equals("&nbsp;"))) {
+                    return etables;
                 }
-                cellAttr.setFont_size("24pt");
-                cellAttr.setBold(true);
-                cellAttr.setRowspan(e.attr("rowspan").equals("") ? 1 : Integer.valueOf(e.attr("rowspan")));
-                cellAttr.setEtype(1); // 2,字段名；3,表单内容
-                cellAttr.setEvalue(e.text());
-                cellAttr.setFont_color(e.attr("color"));
+                if (e.tagName().equals("strong")) {
+                    e = e.parent();
+                    Element colspanElement = e;
+                    CellAttr cellAttr = createCell();
+                    cellAttr.setRowid(mainRow);
+                    cellAttr.setColid(0);
+                    if (e.attr("colspan").equals("")) {
+                        while (colspanElement.attr("colspan").equals("")) {
+                            colspanElement = colspanElement.parent();
+                        }
+                        cellAttr.setColspan(Integer.valueOf(colspanElement.attr("colspan")));
+                        getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(colspanElement.attr("colspan")), "colspan");
+                    } else {
+                        cellAttr.setColspan(Integer.valueOf(e.attr("colspan")));
+                        getMergedCellsInfo(mainRow, mainCol, Integer.valueOf(e.attr("colspan")), "colspan");
+                    }
+                    cellAttr.setFont_size("24pt");
+                    cellAttr.setBold(true);
+                    cellAttr.setRowspan(e.attr("rowspan").equals("") ? 1 : Integer.valueOf(e.attr("rowspan")));
+                    cellAttr.setEtype(1); // 2,字段名；3,表单内容
+                    cellAttr.setEvalue(e.text());
+                    cellAttr.setFont_color(e.attr("color"));
 
-                LinkedHashMap map = new LinkedHashMap();
-                LinkedHashMap map2 = new LinkedHashMap();
-                parseSheet.buildDataEcMap(cellAttr, map);
-                parseSheet.buildPluginCellMap(cellAttr, map2);
-                pluginData.put("" + mainCol, map2);
-                mainList.add(map);
-                pluginMaintableData.put(mainRow + "", pluginData);
-                emaintable.put("ec", mainList);
+                    LinkedHashMap map = new LinkedHashMap();
+                    LinkedHashMap map2 = new LinkedHashMap();
+                    parseSheet.buildDataEcMap(cellAttr, map);
+                    parseSheet.buildPluginCellMap(cellAttr, map2);
+                    pluginData.put("" + mainCol, map2);
+                    mainList.add(map);
+                    pluginMaintableData.put(mainRow + "", pluginData);
+                    emaintable.put("ec", mainList);
+                }
             }
         } else {
             pluginDetailtableData = new LinkedHashMap<>();
@@ -403,10 +403,11 @@ public class CellAnalysis {
                         // 否则就为普通的td
                     } else {
                         if (detailMap.size() == 0) {
-                            for (int i = 0; i < e.select("td").size() + 1; i++) {
+                            int count = e.select("td").size() - e.select("td[style=display: none]").size() + 1;
+                            for (int i = 0; i < count; i++) {
                                 CellAttr cellAttr = new CellAttr();
                                 // 明细空一行的最后一格显示添加和删除按钮
-                                if (i == e.select("td").size()) {
+                                if (i == count - 1) {
                                     cellAttr.setEtype(10);
                                     cellAttr.setBright_style(1);
                                     cellAttr.setBright_color("#90badd");
@@ -456,7 +457,6 @@ public class CellAnalysis {
                                 && lastTr.select("td[style=display: none]").size() == lastTr.select("td").size()) {
                             lastTr = lastTr.previousElementSibling();
                         }
-                        int eee = lastTr.select("td").get(detailCol - 1).select("input").size();
                         if (lastTr != null && lastTr.select("td").get(detailCol - 1).select("input").size() > 0) {
                             cellAttr.setFieldid(lastTr.select("td").get(detailCol - 1).selectFirst("input").attr("name").substring(5));
                         }
@@ -474,9 +474,11 @@ public class CellAnalysis {
                         detailMap.put("ec", detail);
                         detailCol++;
                     }
+                    int index = (detailtd.siblingIndex() + 1) / 2 - 1;
                     pluginDetailtableData.put(detailRow + "", pluginData);
-
-                    if (detailtd.nextElementSibling() == null) {
+                    if (detailtd.nextElementSibling() == null
+                            || (checkForDisplayNone(detailtd.nextElementSibling())
+                            && e.select("td:gt(" + index + ")").size() == e.select("td[style=display: none]:gt(" + index + ")").size())) {
                         maxColumn = detailCol;
                         detailRowheads.put("row_" + detailRow, "30");
                         detailRow++; // 下一行
@@ -753,7 +755,6 @@ public class CellAnalysis {
 
     /**
      * 构建单元格并配置属性
-     * @return
      */
     private CellAttr createCell() {
         CellAttr cellAttr = new CellAttr();
